@@ -1,0 +1,12 @@
+--- decompiled/TerrariaUnified/Terraria/Graphics/Effects/FilterManager.cs
++++ decompiled/Wardian/Terraria/Graphics/Effects/FilterManager.cs
+@@ -130,7 +_,8 @@
+ 			renderTarget2D = screenTarget2;
+ 			graphicsDevice.SetRenderTarget(renderTarget2D);
+ 			graphicsDevice.Clear(clearColor);
++			Matrix.Invert(Main.GameViewMatrix.EffectMatrix, out Matrix matrix);
+-			Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Invert(Main.GameViewMatrix.EffectMatrix));
++            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
+ 			Main.spriteBatch.Draw(renderTarget2D2, Vector2.Zero, Color.White);
+ 			Main.spriteBatch.End();
+ 			renderTarget2D2 = screenTarget2;

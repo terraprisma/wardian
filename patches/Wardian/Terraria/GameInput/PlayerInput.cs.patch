@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/GameInput/PlayerInput.cs
++++ decompiled/Wardian/Terraria/GameInput/PlayerInput.cs
+@@ -1291,7 +_,7 @@
+ 		if (zero != Vector2.Zero) {
+ 			Main.SmartCursorWanted_GamePad = false;
+ 			Matrix zoomMatrix = Main.GameViewMatrix.ZoomMatrix;
+-			Matrix matrix = Matrix.Invert(zoomMatrix);
++			Matrix.Invert(zoomMatrix, out Matrix matrix);
+ 			Vector2 mouseScreen = Main.MouseScreen;
+ 			Vector2.Transform(Main.screenPosition, matrix);
+ 			Vector2 vector2 = Vector2.Transform((Vector2.Transform(mouseScreen, matrix) + zero * new Vector2(16f) + Main.screenPosition).ToTileCoordinates().ToWorldCoordinates() - Main.screenPosition, zoomMatrix);

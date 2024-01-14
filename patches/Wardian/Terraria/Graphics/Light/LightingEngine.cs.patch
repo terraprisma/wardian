@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/Graphics/Light/LightingEngine.cs
++++ decompiled/Wardian/Terraria/Graphics/Light/LightingEngine.cs
+@@ -207,7 +_,7 @@
+ 			if (_workingProcessedArea.Contains(position)) {
+ 				Vector3 value = _perFrameLights[i].Color;
+ 				Vector3 value2 = _workingLightMap[position.X - _workingProcessedArea.X, position.Y - _workingProcessedArea.Y];
+-				Vector3.Max(ref value2, ref value, out value);
++                value = Vector3.Max(value2, value);
+ 				_workingLightMap[position.X - _workingProcessedArea.X, position.Y - _workingProcessedArea.Y] = value;
+ 			}
+ 		}

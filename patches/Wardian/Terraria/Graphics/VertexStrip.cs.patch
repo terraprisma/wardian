@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/Graphics/VertexStrip.cs
++++ decompiled/Wardian/Terraria/Graphics/VertexStrip.cs
+@@ -93,7 +_,7 @@
+ 				float num7 = 1f / (float)num6;
+ 				Vector2 target = vector;
+ 				for (float num8 = num7; num8 < 1f; num8 += num7) {
+-					Vector2 vector3 = Vector2.CatmullRom(value, vector, vector2, value2, num8);
++					Vector2 vector3 = NumericsExtensions.CatmullRom(value, vector, vector2, value2, num8);
+ 					float item = MathHelper.WrapAngle(vector3.DirectionTo(target).ToRotation());
+ 					_temporaryPositionsCache.Add(vector3);
+ 					_temporaryRotationsCache.Add(item);

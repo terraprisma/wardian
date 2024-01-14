@@ -1,0 +1,76 @@
+--- decompiled/TerrariaUnified/Terraria/NPC.cs
++++ decompiled/Wardian/Terraria/NPC.cs
+@@ -25025,7 +_,7 @@
+ 					if (vector181 != Vector2.Zero) {
+ 						Vector2 vector182 = vector181;
+ 						vector182.Normalize();
+-						velocity = Vector2.SmoothStep(velocity, vector182 * Math.Min(8f, vector181.Length()), 0.2f);
++						velocity = NumericsExtensions.SmoothStep(velocity, vector182 * Math.Min(8f, vector181.Length()), 0.2f);
+ 					}
+ 				} else if (num1219 < 210f) {
+ 					num1221 = 1;
+@@ -25038,7 +_,7 @@
+ 						vector183 *= 1.2f;
+ 						int num1233 = Projectile.NewProjectile(GetSpawnSource_ForProjectile(), base.Center.X, base.Center.Y, vector183.X, vector183.Y, 454, 40, 1f, Main.myPlayer, 0f, whoAmI);
+ 					}
+-					Vector2 vector184 = Vector2.SmoothStep(vector179, vector179 + vector180, (num1219 - 30f) / 180f) - base.Center;
++					Vector2 vector184 = NumericsExtensions.SmoothStep(vector179, vector179 + vector180, (num1219 - 30f) / 180f) - base.Center;
+ 					if (vector184 != Vector2.Zero) {
+ 						Vector2 vector185 = vector184;
+ 						vector185.Normalize();
+@@ -25072,7 +_,7 @@
+ 							}
+ 						}
+ 					}
+-					Vector2 vector187 = Vector2.SmoothStep(vector179, vector179 + vector180, 1f - (num1219 - 270f) / 30f) - base.Center;
++					Vector2 vector187 = NumericsExtensions.SmoothStep(vector179, vector179 + vector180, 1f - (num1219 - 270f) / 30f) - base.Center;
+ 					if (vector187 != Vector2.Zero) {
+ 						Vector2 vector188 = vector187;
+ 						vector188.Normalize();
+@@ -25084,7 +_,7 @@
+ 					if (vector189 != Vector2.Zero) {
+ 						Vector2 vector190 = vector189;
+ 						vector190.Normalize();
+-						velocity = Vector2.SmoothStep(velocity, vector190 * Math.Min(8f, vector189.Length()), 0.2f);
++						velocity = NumericsExtensions.SmoothStep(velocity, vector190 * Math.Min(8f, vector189.Length()), 0.2f);
+ 					}
+ 				}
+ 			} else if (this.ai[0] == 3f) {
+@@ -25238,7 +_,7 @@
+ 						if (vector199 != Vector2.Zero) {
+ 							Vector2 vector200 = vector199;
+ 							vector200.Normalize();
+-							velocity = Vector2.SmoothStep(velocity, vector200 * Math.Min(8f, vector199.Length()), 0.2f);
++							velocity = NumericsExtensions.SmoothStep(velocity, vector200 * Math.Min(8f, vector199.Length()), 0.2f);
+ 						}
+ 					} else if (this.ai[1] < 210f) {
+ 						int num1239 = (int)this.ai[1] - 30;
+@@ -25250,7 +_,7 @@
+ 							vector201 *= 1.2f;
+ 							int num1241 = Projectile.NewProjectile(GetSpawnSource_ForProjectile(), base.Center.X, base.Center.Y, vector201.X, vector201.Y, 454, 1, 1f, Main.myPlayer, 0f, whoAmI);
+ 						}
+-						Vector2 vector202 = Vector2.SmoothStep(vector197, vector197 + vector198, (this.ai[1] - 30f) / 180f) - base.Center;
++						Vector2 vector202 = NumericsExtensions.SmoothStep(vector197, vector197 + vector198, (this.ai[1] - 30f) / 180f) - base.Center;
+ 						if (vector202 != Vector2.Zero) {
+ 							Vector2 vector203 = vector202;
+ 							vector203.Normalize();
+@@ -25275,7 +_,7 @@
+ 								}
+ 							}
+ 						}
+-						Vector2 vector205 = Vector2.SmoothStep(vector197, vector197 + vector198, 1f - (this.ai[1] - 270f) / 30f) - base.Center;
++						Vector2 vector205 = NumericsExtensions.SmoothStep(vector197, vector197 + vector198, 1f - (this.ai[1] - 270f) / 30f) - base.Center;
+ 						if (vector205 != Vector2.Zero) {
+ 							Vector2 vector206 = vector205;
+ 							vector206.Normalize();
+@@ -28899,8 +_,8 @@
+ 						float num1569 = (this.ai[0] - 54f) / 30f;
+ 						if (num1569 < 0.95f && num1569 >= 0f) {
+ 							foreach (Vector2 item3 in list2) {
+-								Vector2 value13 = Vector2.CatmullRom(vector304 + vector307, vector304, item3, item3 + vector307, num1569);
++								Vector2 value13 = NumericsExtensions.CatmullRom(vector304 + vector307, vector304, item3, item3 + vector307, num1569);
+-								Vector2 value14 = Vector2.CatmullRom(vector304 + vector307, vector304, item3, item3 + vector307, num1569 + 0.05f);
++								Vector2 value14 = NumericsExtensions.CatmullRom(vector304 + vector307, vector304, item3, item3 + vector307, num1569 + 0.05f);
+ 								float num1570 = num1569;
+ 								if (num1570 > 0.5f) {
+ 									num1570 = 1f - num1570;

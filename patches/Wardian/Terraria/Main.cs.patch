@@ -1,0 +1,38 @@
+--- decompiled/TerrariaUnified/Terraria/Main.cs
++++ decompiled/Wardian/Terraria/Main.cs
+@@ -20828,7 +_,7 @@
+ 					float hue = ((float)i + 5f) / 10f;
+ 					float num10 = 200f;
+ 					float num11 = (float)timeForVisualEffects / 60f;
+-					Vector3 vector2 = Vector3.Transform(matrix: Matrix.CreateRotationX((num11 - 0.3f + (float)i * 0.1f) * 0.7f * ((float)Math.PI * 2f)) * Matrix.CreateRotationY((num11 - 0.8f + (float)i * 0.3f) * 0.7f * ((float)Math.PI * 2f)) * Matrix.CreateRotationZ((num11 + (float)i * 0.5f) * 0.1f * ((float)Math.PI * 2f)), position: Vector3.Forward);
++					Vector3 vector2 = Vector3.Transform(matrix: Matrix.CreateRotationX((num11 - 0.3f + (float)i * 0.1f) * 0.7f * ((float)Math.PI * 2f)) * Matrix.CreateRotationY((num11 - 0.8f + (float)i * 0.3f) * 0.7f * ((float)Math.PI * 2f)) * Matrix.CreateRotationZ((num11 + (float)i * 0.5f) * 0.1f * ((float)Math.PI * 2f)), position: Vector3_Forward);
+ 					num10 += Utils.GetLerpValue(-1f, 1f, vector2.Z, clamped: true) * 150f;
+ 					Vector2 spinningpoint = new Vector2(vector2.X, vector2.Y) * num10 * num7;
+ 					float lerpValue = Utils.GetLerpValue(90f, 0f, rCurrentNPC.ai[1], clamped: true);
+@@ -24642,7 +_,7 @@
+ 						float num222 = 0.9f + num220 * 0.8f;
+ 						num222 *= num222;
+ 						num222 *= 0.8f;
+-						Vector2 position7 = Vector2.SmoothStep(center2, value41, num220);
++						Vector2 position7 = NumericsExtensions.SmoothStep(center2, value41, num220);
+ 						Microsoft.Xna.Framework.Rectangle rectangle8 = value40.Frame(1, 7, 0, (int)(num220 * 7f));
+ 						EntitySpriteDraw(value40, position7, rectangle8, transparent, proj.rotation + (float)Math.PI * 2f * (num220 + GlobalTimeWrappedHourly * 1.2f) * 0.2f + (float)num221 * ((float)Math.PI * 2f / 5f), rectangle8.Size() / 2f, num222, SpriteEffects.None);
+ 					}
+@@ -28779,7 +_,7 @@
+ 		if (!localPlayer.IsProjectileInteractibleAndInInteractionRange(proj, ref compareSpot)) {
+ 			return 0;
+ 		}
+-		Matrix matrix = Matrix.Invert(GameViewMatrix.ZoomMatrix);
++		Matrix.Invert(GameViewMatrix.ZoomMatrix, out Matrix matrix);
+ 		Vector2 position = ReverseGravitySupport(MouseScreen);
+ 		Vector2.Transform(screenPosition, matrix);
+ 		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
+@@ -28844,7 +_,7 @@
+ 		if (!localPlayer.IsProjectileInteractibleAndInInteractionRange(proj, ref compareSpot)) {
+ 			return 0;
+ 		}
+-		Matrix matrix = Matrix.Invert(GameViewMatrix.ZoomMatrix);
++		Matrix.Invert(GameViewMatrix.ZoomMatrix, out Matrix matrix);
+ 		Vector2 position = ReverseGravitySupport(MouseScreen);
+ 		Vector2.Transform(screenPosition, matrix);
+ 		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
