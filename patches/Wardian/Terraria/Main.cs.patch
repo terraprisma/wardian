@@ -1,5 +1,71 @@
 --- decompiled/TerrariaUnified/Terraria/Main.cs
 +++ decompiled/Wardian/Terraria/Main.cs
+@@ -3828,13 +_,18 @@
+ 		configuration.Get("AutoPause", ref autoPause);
+ 		_needsLanguageSelect = !configuration.Contains("Language");
+ 		string text = configuration.Get("Language", "en-US");
+-		int result = 0;
++		/*int result = 0;
+ 		if (int.TryParse(text, out result)) {
+-			LanguageManager.Instance.SetLanguage(result);
++			LanguageManager.INSTANCE.SetLanguage(result);
+ 			SetTitle();
+ 		} else {
+-			LanguageManager.Instance.SetLanguage(text);
++			LanguageManager.INSTANCE.SetLanguage(text);
+ 			SetTitle();
++		}*/
++		_needsLanguageSelect = int.TryParse(text, out _);
++		if (!_needsLanguageSelect)
++		{
++			LanguageManager.INSTANCE.SetLanguage(Languages.GameCultures[text]);
+ 		}
+ 		configuration.Get("PlacementPreview", ref placementPreview);
+ 		configuration.Get("GoreVisualsAllowed", ref ChildSafety.Disabled);
+@@ -4133,11 +_,12 @@
+ 				if (num >= 37) {
+ 					BackgroundEnabled = binaryReader.ReadBoolean();
+ 				}
++				// TODO: Unsupported.
+-				if (num >= 39) {
++				/*if (num >= 39) {
+ 					byte b = binaryReader.ReadByte();
+ 					_needsLanguageSelect = b == 0;
+-					LanguageManager.Instance.SetLanguage(b);
+-				}
++					LanguageManager.INSTANCE.SetLanguage(b);
++				}*/
+ 				if (num >= 46) {
+ 					mapEnabled = binaryReader.ReadBoolean();
+ 					cMapStyle = binaryReader.ReadString();
+@@ -4373,13 +_,14 @@
+ 				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "motd=") {
+ 					motd = text.Substring(5);
+ 				}
++				// TODO: Unsupported.
+-				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "lang=") {
++				/*if (text.Length > 5 && text.Substring(0, 5).ToLower() == "lang=") {
+ 					string value5 = text.Substring(5);
+-					LanguageManager.Instance.SetLanguage(Convert.ToInt32(value5));
+-				}
++					LanguageManager.INSTANCE.SetLanguage(Convert.ToInt32(value5));
++				}*/
+ 				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "language=") {
+ 					string language = text.Substring(9);
+-					LanguageManager.Instance.SetLanguage(language);
++					LanguageManager.INSTANCE.SetLanguage(Languages.GameCultures[language]);
+ 				}
+ 				if (text.Length >= 10 && text.Substring(0, 10).ToLower() == "worldpath=") {
+ 					string path2 = text.Substring(10);
+@@ -9180,7 +_,7 @@
+ 	private void ClientInitialize()
+ 	{
+ 		MessageBuffer.OnTileChangeReceived += OnTileChangeEvent;
+-		LanguageManager.Instance.OnLanguageChanged += delegate {
++		LanguageManager.INSTANCE.OnLanguageChanged += delegate {
+ 			ItemTooltip.InvalidateTooltips();
+ 		};
+ 		PlayerInput.OnBindingChange += ItemTooltip.InvalidateTooltips;
 @@ -20828,7 +_,7 @@
  					float hue = ((float)i + 5f) / 10f;
  					float num10 = 200f;
@@ -36,3 +102,60 @@
  		Vector2 position = ReverseGravitySupport(MouseScreen);
  		Vector2.Transform(screenPosition, matrix);
  		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
+@@ -36380,7 +_,7 @@
+ 		string text = "";
+ 		float num4 = 215f;
+ 		int startX = 0;
+-		if (GameCulture.FromCultureName(GameCulture.CultureName.Russian).IsActive) {
++		if (Languages.Russian.IsActive) {
+ 			startX = -50;
+ 			num4 += 50f;
+ 		}
+@@ -37244,7 +_,7 @@
+ 			Vector2 vector = new Vector2(screenWidth - 120, screenHeight - 40);
+ 			Utils.DrawInvBG(R: new Microsoft.Xna.Framework.Rectangle((int)vector.X - num2 / 2, (int)vector.Y - num3 / 2, num2, num3), sb: spriteBatch, c: new Microsoft.Xna.Framework.Color(63, 65, 151, 255) * 0.785f);
+ 			string text2 = "";
+-			text2 = Language.GetTextValue(arg1: (invasionProgressMax != 0) ? ((int)((float)invasionProgress * 100f / (float)invasionProgressMax) + "%") : Language.GetTextValue("Game.InvasionPoints", invasionProgress), key: "Game.WaveMessage", arg0: invasionProgressWave);
++			text2 = Language.GetTextValue("Game.WaveMessage", invasionProgressWave, (invasionProgressMax != 0) ? ((int)((float)invasionProgress * 100f / (float)invasionProgressMax) + "%") : Language.GetTextValue("Game.InvasionPoints", invasionProgress));
+ 			Texture2D value2 = TextureAssets.ColorBar.Value;
+ 			_ = TextureAssets.ColorBlip.Value;
+ 			float num4 = MathHelper.Clamp((float)invasionProgress / (float)invasionProgressMax, 0f, 1f);
+@@ -37814,7 +_,7 @@
+ 			array7[0] = 1f;
+ 			if (selectedMenu >= 1) {
+ 				changeTheTitle = true;
+-				LanguageManager.Instance.SetLanguage(selectedMenu);
++				LanguageManager.INSTANCE.SetLanguage(Languages.DangerousGetCultureFromLegacyId(selectedMenu));
+ 				menuMode = 0;
+ 				SoundEngine.PlaySound(10);
+ 				SaveSettings();
+@@ -37839,7 +_,7 @@
+ 				SoundEngine.PlaySound(11);
+ 			} else if (selectedMenu >= 1) {
+ 				changeTheTitle = true;
+-				LanguageManager.Instance.SetLanguage(selectedMenu);
++				LanguageManager.INSTANCE.SetLanguage(Languages.DangerousGetCultureFromLegacyId(selectedMenu));
+ 				SoundEngine.PlaySound(12);
+ 				SaveSettings();
+ 			}
+@@ -40550,7 +_,8 @@
+ 
+ 	private void OnSubmitServerPassword()
+ 	{
++		// TODO: LegacyID no longer supported.
+-		string text = "-autoshutdown -password \"" + ConvertToSafeArgument(Netplay.ServerPassword) + "\" -lang " + Language.ActiveCulture.LegacyId;
++		string text = "-autoshutdown -password \"" + ConvertToSafeArgument(Netplay.ServerPassword) /*+ "\" -lang " + Language.ActiveCulture.LegacyId*/;
+ 		if (Platform.IsLinux) {
+ 			text = ((IntPtr.Size != 8) ? (text + " -x86") : (text + " -x64"));
+ 		}
+@@ -50703,8 +_,8 @@
+ 
+ 	private static void InvasionWarning()
+ 	{
+-		LocalizedText empty = LocalizedText.Empty;
++		LocalizedText empty = LocalizedText.EMPTY;
+-		empty = ((invasionSize <= 0) ? ((invasionType == 2) ? Lang.misc[4] : ((invasionType == 3) ? Lang.misc[24] : ((invasionType != 4) ? (empty = Lang.misc[0]) : Lang.misc[42]))) : ((invasionX < (double)spawnTileX) ? ((invasionType == 2) ? Lang.misc[5] : ((invasionType == 3) ? Lang.misc[25] : ((invasionType != 4) ? (empty = Lang.misc[1]) : LocalizedText.Empty))) : ((invasionX > (double)spawnTileX) ? ((invasionType == 2) ? Lang.misc[6] : ((invasionType == 3) ? Lang.misc[26] : ((invasionType != 4) ? (empty = Lang.misc[2]) : LocalizedText.Empty))) : ((invasionType == 2) ? Lang.misc[7] : ((invasionType == 3) ? Lang.misc[27] : ((invasionType != 4) ? (empty = Lang.misc[3]) : Lang.misc[41]))))));
++		empty = ((invasionSize <= 0) ? ((invasionType == 2) ? Lang.misc[4] : ((invasionType == 3) ? Lang.misc[24] : ((invasionType != 4) ? (empty = Lang.misc[0]) : Lang.misc[42]))) : ((invasionX < (double)spawnTileX) ? ((invasionType == 2) ? Lang.misc[5] : ((invasionType == 3) ? Lang.misc[25] : ((invasionType != 4) ? (empty = Lang.misc[1]) : LocalizedText.EMPTY))) : ((invasionX > (double)spawnTileX) ? ((invasionType == 2) ? Lang.misc[6] : ((invasionType == 3) ? Lang.misc[26] : ((invasionType != 4) ? (empty = Lang.misc[2]) : LocalizedText.EMPTY))) : ((invasionType == 2) ? Lang.misc[7] : ((invasionType == 3) ? Lang.misc[27] : ((invasionType != 4) ? (empty = Lang.misc[3]) : Lang.misc[41]))))));
+ 		if (netMode == 0) {
+ 			NewText(empty.ToString(), 175, 75);
+ 		} else if (netMode == 2 && empty.Value != "") {

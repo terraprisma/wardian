@@ -74,3 +74,48 @@
  								float num1570 = num1569;
  								if (num1570 > 0.5f) {
  									num1570 = 1f - num1570;
+@@ -55808,7 +_,7 @@
+ 			return;
+ 		}
+ 		int num = 0;
+-		NetworkText networkText = NetworkText.Empty;
++		NetworkText networkText = NetworkText.EMPTY;
+ 		num = MoonEventRequiredPointsPerWaveLookup[waveNumber];
+ 		switch (waveNumber) {
+ 			case 1:
+@@ -55919,7 +_,7 @@
+ 			waveKills = 0f;
+ 			waveNumber++;
+ 			num = MoonEventRequiredPointsPerWaveLookup[waveNumber];
+-			if (networkText != NetworkText.Empty) {
++			if (networkText != NetworkText.EMPTY) {
+ 				if (Main.netMode == 0) {
+ 					Main.NewText(networkText.ToString(), 175, 75);
+ 				} else if (Main.netMode == 2) {
+@@ -55946,7 +_,7 @@
+ 			return;
+ 		}
+ 		int num = 0;
+-		NetworkText networkText = NetworkText.Empty;
++		NetworkText networkText = NetworkText.EMPTY;
+ 		num = MoonEventRequiredPointsPerWaveLookup[waveNumber];
+ 		switch (waveNumber) {
+ 			case 1:
+@@ -56048,7 +_,7 @@
+ 			waveKills = 0f;
+ 			waveNumber++;
+ 			num = MoonEventRequiredPointsPerWaveLookup[waveNumber];
+-			if (networkText != NetworkText.Empty) {
++			if (networkText != NetworkText.EMPTY) {
+ 				if (Main.netMode == 0) {
+ 					Main.NewText(networkText.ToString(), 175, 75);
+ 				} else if (Main.netMode == 2) {
+@@ -71247,7 +_,7 @@
+ 	public bool GetSpecialEventTextIfNotEmpty(string specialTextKey, object substitutes, ref string specialEventText)
+ 	{
+ 		LocalizedText localizedText = Language.SelectRandom(Lang.CreateDialogFilter(specialTextKey));
+-		if (localizedText != LocalizedText.Empty) {
++		if (localizedText != LocalizedText.EMPTY) {
+ 			specialEventText = localizedText.FormatWith(substitutes);
+ 			return true;
+ 		}

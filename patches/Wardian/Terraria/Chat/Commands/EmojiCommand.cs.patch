@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/Chat/Commands/EmojiCommand.cs
++++ decompiled/Wardian/Terraria/Chat/Commands/EmojiCommand.cs
+@@ -22,7 +_,7 @@
+ 		_byName.Clear();
+ 		for (int i = 0; i < EmoteID.Count; i++) {
+ 			LocalizedText emojiName = Lang.GetEmojiName(i);
+-			if (emojiName != LocalizedText.Empty) {
++			if (emojiName != LocalizedText.EMPTY) {
+ 				_byName[emojiName] = i;
+ 			}
+ 		}

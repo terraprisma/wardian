@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/NetMessage.cs
++++ decompiled/Wardian/Terraria/NetMessage.cs
+@@ -89,7 +_,7 @@
+ 		}
+ 		int num = 256;
+ 		if (text == null) {
+-			text = NetworkText.Empty;
++			text = NetworkText.EMPTY;
+ 		}
+ 		if (Main.netMode == 2 && remoteClient >= 0) {
+ 			num = remoteClient;

@@ -1,0 +1,10 @@
+--- decompiled/TerrariaUnified/Terraria/GameContent/LucyAxeMessage.cs
++++ decompiled/Wardian/Terraria/GameContent/LucyAxeMessage.cs
+@@ -156,6 +_,6 @@
+ 	private static string GetTextForVariation(MessageSource source, int variationUnwrapped)
+ 	{
+ 		string categoryName = GetCategoryName(source);
+-		return LanguageManager.Instance.IndexedFromCategory(categoryName, variationUnwrapped).Value;
++		return LanguageManager.INSTANCE.IndexedFromCategory(categoryName, variationUnwrapped).Value;
+ 	}
+ }

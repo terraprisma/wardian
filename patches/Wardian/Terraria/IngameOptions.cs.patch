@@ -1,0 +1,17 @@
+--- decompiled/TerrariaUnified/Terraria/IngameOptions.cs
++++ decompiled/Wardian/Terraria/IngameOptions.cs
+@@ -104,10 +_,10 @@
+ 		for (int i = 0; i < skipRightSlot.Length; i++) {
+ 			skipRightSlot[i] = false;
+ 		}
+-		bool flag = GameCulture.FromCultureName(GameCulture.CultureName.Russian).IsActive || GameCulture.FromCultureName(GameCulture.CultureName.Portuguese).IsActive || GameCulture.FromCultureName(GameCulture.CultureName.Polish).IsActive || GameCulture.FromCultureName(GameCulture.CultureName.French).IsActive;
+-		bool isActive = GameCulture.FromCultureName(GameCulture.CultureName.Polish).IsActive;
+-		bool isActive2 = GameCulture.FromCultureName(GameCulture.CultureName.German).IsActive;
+-		bool flag2 = GameCulture.FromCultureName(GameCulture.CultureName.Italian).IsActive || GameCulture.FromCultureName(GameCulture.CultureName.Spanish).IsActive;
++		bool flag = Languages.Russian.IsActive || Languages.BrazilianPortuguese.IsActive || Languages.Polish.IsActive || Languages.French.IsActive;
++		bool isActive = Languages.Polish.IsActive;
++		bool isActive2 = Languages.German.IsActive;
++		bool flag2 = Languages.Italian.IsActive || Languages.Spanish.IsActive;
+ 		bool flag3 = false;
+ 		int num = 70;
+ 		float scale = 0.75f;

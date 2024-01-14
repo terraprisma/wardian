@@ -1,0 +1,175 @@
+--- decompiled/TerrariaUnified/Terraria/Localization/LocalizedText.cs
++++ decompiled/Wardian/Terraria/Localization/LocalizedText.cs
+@@ -1,17 +_,30 @@
+ using System.ComponentModel;
++using System.Linq;
+ using System.Text.RegularExpressions;
+ 
+ namespace Terraria.Localization;
+ 
+-public class LocalizedText
++/// <summary>
++///		A localized text entry, containing a key that points to a substitutable value.
++/// </summary>
++public sealed partial class LocalizedText
+ {
+-	public static readonly LocalizedText Empty = new LocalizedText("", "");
+-
+-	private static Regex _substitutionRegex = new Regex("{(\\?(?:!)?)?([a-zA-Z][\\w\\.]*)}", RegexOptions.Compiled);
+-
+-	public readonly string Key;
+-
+-	public string Value { get; private set; }
++	/// <summary>
++	///		A constant reference to an empty localized text entry.
++	/// </summary>
++	public static readonly LocalizedText EMPTY = new("", "");
++
++	private static readonly Regex substitution_regex = SubstitutionRegex();
++
++	/// <summary>
++	///		This localized text's key.
++	/// </summary>
++	public string Key { get; }
++
++	/// <summary>
++	///		The text value of this localized text, unformatted.
++	/// </summary>
++	public string Value { get; internal set; }
+ 
+ 	internal LocalizedText(string key, string text)
+ 	{
+@@ -19,75 +_,79 @@
+ 		Value = text;
+ 	}
+ 
+-	internal void SetValue(string text)
+-	{
+-		Value = text;
+-	}
+-
++	/// <summary>
++	///		Formats this localized text with the given <paramref name="obj"/>.
++	/// </summary>
++	/// <param name="obj">The object to format with.</param>
++	/// <returns>The formatted string.</returns>
++	/// <remarks>
++	///		This is specifically for use with named arguments, e.g. <c>Available Packs ({Amount})</c>.
++	/// </remarks>
+ 	public string FormatWith(object obj)
+ 	{
+-		string value = Value;
+-		PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(obj);
+-		return _substitutionRegex.Replace(value, delegate(Match match) {
+-			if (match.Groups[1].Length != 0) {
++		return substitution_regex.Replace(Value, match =>
++		{
++			if (match.Groups[1].Length != 0)
++			{
+ 				return "";
+ 			}
++
+ 			string name = match.Groups[2].ToString();
+-			PropertyDescriptor propertyDescriptor = properties.Find(name, ignoreCase: false);
++			PropertyDescriptor propertyDescriptor = TypeDescriptor.GetProperties(obj).Find(name, ignoreCase: false);
+ 			return (propertyDescriptor == null) ? "" : (propertyDescriptor.GetValue(obj) ?? "").ToString();
+ 		});
+ 	}
+ 
++	/// <summary>
++	///		Whether this localized text may be formatted with the <paramref name="obj"/>, for use with <see cref="FormatWith(object)"/>.
++	/// </summary>
++	/// <param name="obj">The object to format with.</param>
++	/// <returns>Whether this localized text may be formatted with the <paramref name="obj"/>,</returns>
+ 	public bool CanFormatWith(object obj)
+ 	{
+-		PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(obj);
+-		foreach (Match item in _substitutionRegex.Matches(Value)) {
++		foreach (Match item in substitution_regex.Matches(Value).Cast<Match>())
++		{
+ 			string name = item.Groups[2].ToString();
+-			PropertyDescriptor propertyDescriptor = properties.Find(name, ignoreCase: false);
+-			if (propertyDescriptor == null) {
+-				return false;
+-			}
+-			object value = propertyDescriptor.GetValue(obj);
+-			if (value == null) {
+-				return false;
+-			}
+-			if (item.Groups[1].Length != 0 && (((value as bool?) ?? false) ^ (item.Groups[1].Length == 1))) {
++			PropertyDescriptor descriptor = TypeDescriptor.GetProperties(obj).Find(name, ignoreCase: false);
++
++			if (descriptor == null)
++			{
++				return false;
++			}
++
++			object value = descriptor.GetValue(obj);
++
++			if (value == null)
++			{
++				return false;
++			}
++
++			// Length > 0 and (value is true XOR length == 1), so return false iff EITHER value is true or length = 1, not both or neither.
++			// TODO: This is really gross and weird -- where and how is this used, at all? Can we remove this?
++			if (item.Groups[1].Length != 0 && (((value as bool?) ?? false) ^ (item.Groups[1].Length == 1)))
++			{
+ 				return false;
+ 			}
+ 		}
++
+ 		return true;
+ 	}
+ 
+-	public NetworkText ToNetworkText()
+-	{
+-		return NetworkText.FromKey(Key);
+-	}
+-
++	/// <summary>
++	///		Converts this localized text to a <see cref="NetworkText"/>.
++	/// </summary>
++	/// <param name="substitutions">Any substitutions to format with.</param>
++	/// <returns>The <see cref="NetworkText"/>.</returns>
+ 	public NetworkText ToNetworkText(params object[] substitutions)
+ 	{
+ 		return NetworkText.FromKey(Key, substitutions);
+ 	}
+ 
+-	public static explicit operator string(LocalizedText text)
+-	{
+-		return text.Value;
+-	}
+-
+-	public string Format(object arg0)
+-	{
+-		return string.Format(Value, arg0);
+-	}
+-
+-	public string Format(object arg0, object arg1)
+-	{
+-		return string.Format(Value, arg0, arg1);
+-	}
+-
+-	public string Format(object arg0, object arg1, object arg2)
+-	{
+-		return string.Format(Value, arg0, arg1, arg2);
+-	}
+-
++	/// <summary>
++	///		Formats the <see cref="Value"/> with the given <paramref name="args"/>.
++	/// </summary>
++	/// <param name="args">The arguments to format with.</param>
++	/// <returns>The formatted string.</returns>
+ 	public string Format(params object[] args)
+ 	{
+ 		return string.Format(Value, args);
+@@ -97,4 +_,7 @@
+ 	{
+ 		return Value;
+ 	}
++
++	[GeneratedRegex("{(\\?(?:!)?)?([a-zA-Z][\\w\\.]*)}", RegexOptions.Compiled)]
++	private static partial Regex SubstitutionRegex();
+ }

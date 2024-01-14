@@ -1,0 +1,337 @@
+--- decompiled/TerrariaUnified/Terraria/Localization/NetworkText.cs
++++ decompiled/Wardian/Terraria/Localization/NetworkText.cs
+@@ -4,166 +_,218 @@
+ 
+ namespace Terraria.Localization;
+ 
+-public class NetworkText
++/// <summary>
++///		Text which may be sent over a network.
++/// </summary>
++public sealed class NetworkText
+ {
++	/// <summary>
++	///		The text mode.
++	/// </summary>
+ 	private enum Mode : byte
+ 	{
++		/// <summary>
++		///		Literal, raw text.
++		/// </summary>
+ 		Literal,
++
++		/// <summary>
++		///		Raw text that may be formatted.
++		/// </summary>
+ 		Formattable,
++
++		/// <summary>
++		///		Text that maps to a localization key.
++		/// </summary>
+ 		LocalizationKey
+ 	}
+ 
++	/// <summary>
++	///		A constant reference to an empty network text.
++	/// </summary>
+-	public static readonly NetworkText Empty = FromLiteral("");
++	public static readonly NetworkText EMPTY = FromLiteral("");
+ 
+-	private NetworkText[] _substitutions;
++	private NetworkText[] substitutions;
+-
+-	private string _text;
++	private string text;
+-
+-	private Mode _mode;
++	private Mode mode;
+ 
+ 	private NetworkText(string text, Mode mode)
+ 	{
+-		_text = text;
++		this.text = text;
+-		_mode = mode;
++		this.mode = mode;
++	}
++
++	public override string ToString()
++	{
++		try
++		{
++			return mode switch
++			{
++				Mode.Literal => text,
++				Mode.Formattable => string.Format(text, substitutions),
++				Mode.LocalizationKey => Language.GetTextValue(text, substitutions),
++				_ => text,
++			};
++		}
++		catch (Exception)
++		{
++			// string.Concat(string.Concat("NetworkText.ToString() threw an exception.\n" + ToDebugInfoString(), "\n"), "Exception: ", ex);
++			SetToEmptyLiteral();
++		}
++		return text;
++	}
++
++	/// <summary>
++	///		Estimates the worst-case scenario for serialization size, to be used when sending packets.
++	/// </summary>
++	/// <returns>An integer indicating the maximum serialization size.</returns>
++	public int GetMaxSerializedSize()
++	{
++		int serializedSize = 5 + Encoding.UTF8.GetByteCount(text);
++
++		if (mode == 0)
++		{
++			return serializedSize;
++		}
++
++		serializedSize++;
++
++		for (int i = 0; i < substitutions.Length; i++)
++		{
++			serializedSize += substitutions[i].GetMaxSerializedSize();
++		}
++
++		return serializedSize;
++	}
++
++	/// <summary>
++	///		Serializes the <see cref="NetworkText"/> to the <paramref name="writer"/>.
++	/// </summary>
++	/// <param name="writer">The writer to write this <see cref="NetworkText"/> to.</param>
++	public void Serialize(BinaryWriter writer)
++	{
++		writer.Write((byte)mode);
++		writer.Write(text);
++		SerializeSubstitutionList(writer);
++	}
++
++	private void SerializeSubstitutionList(BinaryWriter writer)
++	{
++		if (mode == 0)
++		{
++			return;
++		}
++
++		writer.Write((byte)substitutions.Length);
++
++		for (int i = 0; i < (substitutions.Length & 0xFF); i++)
++		{
++			substitutions[i].Serialize(writer);
++		}
++	}
++
++	private void DeserializeSubstitutionList(BinaryReader reader)
++	{
++		if (mode != 0)
++		{
++			substitutions = new NetworkText[reader.ReadByte()];
++			for (int i = 0; i < substitutions.Length; i++)
++			{
++				substitutions[i] = Deserialize(reader);
++			}
++		}
++	}
++
++	private void SetToEmptyLiteral()
++	{
++		mode = Mode.Literal;
++		text = string.Empty;
++		substitutions = null;
++	}
++
++	private string ToDebugInfoString(string linePrefix = "")
++	{
++		string value = string.Format("{0}Mode: {1}\n{0}Text: {2}\n", linePrefix, mode, this.text);
++
++		if (mode == Mode.LocalizationKey)
++		{
++			value += $"{linePrefix}Localized Text: {Language.GetTextValue(text)}\n";
++		}
++
++		if (mode != 0)
++		{
++			for (int i = 0; i < substitutions.Length; i++)
++			{
++				value += $"{linePrefix}Substitution {i}:\n";
++				value += substitutions[i].ToDebugInfoString(linePrefix + "\t");
++			}
++		}
++
++		return value;
+ 	}
+ 
+ 	private static NetworkText[] ConvertSubstitutionsToNetworkText(object[] substitutions)
+ 	{
+-		NetworkText[] array = new NetworkText[substitutions.Length];
++		NetworkText[] substituionTexts = new NetworkText[substitutions.Length];
++
+ 		for (int i = 0; i < substitutions.Length; i++) {
+-			NetworkText networkText = substitutions[i] as NetworkText;
+-			if (networkText == null) {
++			if (substitutions[i] is not NetworkText networkText)
++			{
+ 				networkText = FromLiteral(substitutions[i].ToString());
+ 			}
++
+-			array[i] = networkText;
++			substituionTexts[i] = networkText;
+ 		}
++
+-		return array;
++		return substituionTexts;
+ 	}
+ 
++	/// <summary>
++	///     Creates a new <see cref="NetworkText"/> instance from a formattable string with substitutions.
++	/// </summary>
++	/// <param name="text">The formattable string.</param>
++	/// <param name="substitutions">Substitutions for the formattable string.</param>
++	/// <returns>A <see cref="NetworkText"/> with a formattable string containing substitutions.</returns>
+ 	public static NetworkText FromFormattable(string text, params object[] substitutions)
+ 	{
+ 		return new NetworkText(text, Mode.Formattable) {
+-			_substitutions = ConvertSubstitutionsToNetworkText(substitutions)
++			substitutions = ConvertSubstitutionsToNetworkText(substitutions)
+ 		};
+ 	}
+ 
++	/// <summary>
++	///     Creates a new <see cref="NetworkText"/> instance from a raw string literal.
++	/// </summary>
++	/// <param name="text">The raw string literal.</param>
++	/// <returns>A <see cref="NetworkText"/> with a raw string literal.</returns>
+ 	public static NetworkText FromLiteral(string text)
+ 	{
+ 		return new NetworkText(text, Mode.Literal);
+ 	}
+ 
++	/// <summary>
++	///     Creates a new <see cref="NetworkText"/> instance from a localized key.
++	/// </summary>
++	/// <param name="key">The localized key.</param>
++	/// <param name="substitutions">Substitutions for the localized key.</param>
++	/// <returns>A <see cref="NetworkText"/> with a localized key whose value contains substitutions.</returns>
+ 	public static NetworkText FromKey(string key, params object[] substitutions)
+ 	{
+ 		return new NetworkText(key, Mode.LocalizationKey) {
+-			_substitutions = ConvertSubstitutionsToNetworkText(substitutions)
++			substitutions = ConvertSubstitutionsToNetworkText(substitutions)
+ 		};
+ 	}
+ 
+-	public int GetMaxSerializedSize()
+-	{
+-		int num = 0;
+-		num++;
+-		num += 4 + Encoding.UTF8.GetByteCount(_text);
+-		if (_mode != 0) {
+-			num++;
+-			for (int i = 0; i < _substitutions.Length; i++) {
+-				num += _substitutions[i].GetMaxSerializedSize();
+-			}
+-		}
+-		return num;
+-	}
+-
+-	public void Serialize(BinaryWriter writer)
+-	{
+-		writer.Write((byte)_mode);
+-		writer.Write(_text);
+-		SerializeSubstitutionList(writer);
+-	}
+-
+-	private void SerializeSubstitutionList(BinaryWriter writer)
+-	{
+-		if (_mode != 0) {
+-			writer.Write((byte)_substitutions.Length);
+-			for (int i = 0; i < (_substitutions.Length & 0xFF); i++) {
+-				_substitutions[i].Serialize(writer);
+-			}
+-		}
+-	}
+-
++	/// <summary>
++	///		Deserializes a <see cref="NetworkText"/> from the given <paramref name="reader"/>.
++	/// </summary>
++	/// <param name="reader">The reader to read a <see cref="NetworkText"/> from.</param>
++	/// <returns>The deserialized <see cref="NetworkText"/> instance.</returns>
+ 	public static NetworkText Deserialize(BinaryReader reader)
+ 	{
+ 		Mode mode = (Mode)reader.ReadByte();
+ 		NetworkText networkText = new NetworkText(reader.ReadString(), mode);
+ 		networkText.DeserializeSubstitutionList(reader);
+ 		return networkText;
+-	}
+-
+-	public static NetworkText DeserializeLiteral(BinaryReader reader)
+-	{
+-		Mode mode = (Mode)reader.ReadByte();
+-		NetworkText networkText = new NetworkText(reader.ReadString(), mode);
+-		networkText.DeserializeSubstitutionList(reader);
+-		if (mode != 0) {
+-			networkText.SetToEmptyLiteral();
+-		}
+-		return networkText;
+-	}
+-
+-	private void DeserializeSubstitutionList(BinaryReader reader)
+-	{
+-		if (_mode != 0) {
+-			_substitutions = new NetworkText[reader.ReadByte()];
+-			for (int i = 0; i < _substitutions.Length; i++) {
+-				_substitutions[i] = Deserialize(reader);
+-			}
+-		}
+-	}
+-
+-	private void SetToEmptyLiteral()
+-	{
+-		_mode = Mode.Literal;
+-		_text = string.Empty;
+-		_substitutions = null;
+-	}
+-
+-	public override string ToString()
+-	{
+-		try {
+-			switch (_mode) {
+-				case Mode.Literal:
+-					return _text;
+-				case Mode.Formattable: {
+-					string text2 = _text;
+-					object[] substitutions = _substitutions;
+-					return string.Format(text2, substitutions);
+-				}
+-				case Mode.LocalizationKey: {
+-					string text = _text;
+-					object[] substitutions = _substitutions;
+-					return Language.GetTextValue(text, substitutions);
+-				}
+-				default:
+-					return _text;
+-			}
+-		} catch (Exception ex) {
+-			string.Concat(string.Concat("NetworkText.ToString() threw an exception.\n" + ToDebugInfoString(), "\n"), "Exception: ", ex);
+-			SetToEmptyLiteral();
+-		}
+-		return _text;
+-	}
+-
+-	private string ToDebugInfoString(string linePrefix = "")
+-	{
+-		string text = string.Format("{0}Mode: {1}\n{0}Text: {2}\n", linePrefix, _mode, _text);
+-		if (_mode == Mode.LocalizationKey) {
+-			text += $"{linePrefix}Localized Text: {Language.GetTextValue(_text)}\n";
+-		}
+-		if (_mode != 0) {
+-			for (int i = 0; i < _substitutions.Length; i++) {
+-				text += $"{linePrefix}Substitution {i}:\n";
+-				text += _substitutions[i].ToDebugInfoString(linePrefix + "\t");
+-			}
+-		}
+-		return text;
+ 	}
+ }

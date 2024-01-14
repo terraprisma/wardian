@@ -1,0 +1,15 @@
+--- decompiled/TerrariaUnified/Terraria/Localization/LanguageSearchFilter.cs
++++ decompiled/Wardian/Terraria/Localization/LanguageSearchFilter.cs
+@@ -1,3 +_,12 @@
+ namespace Terraria.Localization;
+ 
++/// <summary>
++///		Represents a language search filter used for tasks like <see cref="Language.FindAll(LanguageSearchFilter)"/> and <see cref="Language.SelectRandom(LanguageSearchFilter, Utilities.UnifiedRandom)"/>.
++/// </summary>
++/// <param name="key">The localized text key.</param>
++/// <param name="text">The localized text.</param>
++/// <returns>Whether the filter matches.</returns>
++/// <remarks>
++///		Works similarly to RegEx.
++/// </remarks>
+ public delegate bool LanguageSearchFilter(string key, LocalizedText text);

@@ -1,0 +1,19 @@
+--- decompiled/TerrariaUnified/Terraria/GameContent/UI/States/UICharacterCreation.cs
++++ decompiled/Wardian/Terraria/GameContent/UI/States/UICharacterCreation.cs
+@@ -586,13 +_,13 @@
+ 	private UIColoredSlider CreateHSLSliderButtonBase(HSLSliderId id)
+ 	{
+ 		return id switch {
+-			HSLSliderId.Saturation => new UIColoredSlider(LocalizedText.Empty, () => GetHSLSliderPosition(HSLSliderId.Saturation), delegate(float x) {
++			HSLSliderId.Saturation => new UIColoredSlider(LocalizedText.EMPTY, () => GetHSLSliderPosition(HSLSliderId.Saturation), delegate(float x) {
+ 				UpdateHSLValue(HSLSliderId.Saturation, x);
+ 			}, UpdateHSL_S, (float x) => GetHSLSliderColorAt(HSLSliderId.Saturation, x), Color.Transparent), 
+-			HSLSliderId.Luminance => new UIColoredSlider(LocalizedText.Empty, () => GetHSLSliderPosition(HSLSliderId.Luminance), delegate(float x) {
++			HSLSliderId.Luminance => new UIColoredSlider(LocalizedText.EMPTY, () => GetHSLSliderPosition(HSLSliderId.Luminance), delegate(float x) {
+ 				UpdateHSLValue(HSLSliderId.Luminance, x);
+ 			}, UpdateHSL_L, (float x) => GetHSLSliderColorAt(HSLSliderId.Luminance, x), Color.Transparent), 
+-			_ => new UIColoredSlider(LocalizedText.Empty, () => GetHSLSliderPosition(HSLSliderId.Hue), delegate(float x) {
++			_ => new UIColoredSlider(LocalizedText.EMPTY, () => GetHSLSliderPosition(HSLSliderId.Hue), delegate(float x) {
+ 				UpdateHSLValue(HSLSliderId.Hue, x);
+ 			}, UpdateHSL_H, (float x) => GetHSLSliderColorAt(HSLSliderId.Hue, x), Color.Transparent), 
+ 		};

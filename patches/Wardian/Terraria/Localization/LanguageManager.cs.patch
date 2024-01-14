@@ -1,0 +1,620 @@
+--- decompiled/TerrariaUnified/Terraria/Localization/LanguageManager.cs
++++ decompiled/Wardian/Terraria/Localization/LanguageManager.cs
+@@ -1,32 +_,22 @@
+ using System;
+ using System.Collections.Generic;
+ using System.Diagnostics;
+-using System.Globalization;
+ using System.IO;
+-using System.Linq;
+-using System.Reflection;
+ using System.Text.RegularExpressions;
+ using System.Threading;
+-using CsvHelper;
+-using CsvHelper.Configuration;
+ using Newtonsoft.Json;
+ using ReLogic.Content.Sources;
+ using ReLogic.Graphics;
+-using Terraria.GameContent;
+ using Terraria.Initializers;
+ using Terraria.Utilities;
+ 
++// TODO: (Minor) summaries.
++
+ namespace Terraria.Localization;
+ 
+-public class LanguageManager
++public sealed partial class LanguageManager
+ {
+-	public static LanguageManager Instance = new LanguageManager();
+-
+-	private readonly Dictionary<string, LocalizedText> _localizedTexts = new Dictionary<string, LocalizedText>();
+-
+-	private readonly Dictionary<string, List<string>> _categoryGroupedKeys = new Dictionary<string, List<string>>();
+-
+-	private GameCulture _fallbackCulture = GameCulture.DefaultCulture;
++	public static readonly LanguageManager INSTANCE = new();
+ 
+ 	public GameCulture ActiveCulture { get; private set; }
+ 
+@@ -34,111 +_,147 @@
+ 
+ 	public event LanguageChangeCallback OnLanguageChanged;
+ 
++	private readonly Dictionary<string, LocalizedText> localizedTexts = new();
++	private readonly Dictionary<string, List<string>> categoryGroupedKeys = new();
++	private GameCulture fallbackCulture = GameCulture.DefaultCulture;
++
+ 	private LanguageManager()
+ 	{
+-		_localizedTexts[""] = LocalizedText.Empty;
++		localizedTexts[""] = LocalizedText.EMPTY;
+ 	}
+ 
+ 	public int GetCategorySize(string name)
+ 	{
+-		if (_categoryGroupedKeys.ContainsKey(name)) {
+-			return _categoryGroupedKeys[name].Count;
++		if (!categoryGroupedKeys.TryGetValue(name, out List<string> value))
++		{
++			return 0;
+ 		}
+-		return 0;
+-	}
+-
+-	public void SetLanguage(int legacyId)
+-	{
+-		GameCulture language = GameCulture.FromLegacyId(legacyId);
+-		SetLanguage(language);
+-	}
+-
+-	public void SetLanguage(string cultureName)
+-	{
+-		GameCulture language = GameCulture.FromName(cultureName);
+-		SetLanguage(language);
++
++		return value.Count;
+ 	}
+ 
+ 	public int EstimateWordCount()
+ 	{
+-		int num = 0;
+-		foreach (string key in _localizedTexts.Keys) {
+-			string textValue = GetTextValue(key);
+-			textValue.Replace(",", "").Replace(".", "").Replace("\"", "")
+-				.Trim();
+-			string[] array = textValue.Split(' ');
+-			string[] array2 = textValue.Split(' ');
+-			if (array.Length != array2.Length) {
++		int wordCount = 0;
++
++		foreach (string key in localizedTexts.Keys)
++		{
++			string value = GetTextValue(key);
++			value.Replace(",", "").Replace(".", "").Replace("\"", "").Trim();
++
++			string[] words = value.Split(' ');
++
++			// TODO: When is the following sanity check ever true? Split should be pure ergo deterministic.
++			/*
++			string[] alsoWords = value.Split(' ');
++			
++			if (wordsDeterminedBySpaces.Length != alsoWords.Length)
++			{
+ 				break;
+ 			}
+-			string[] array3 = array;
+-			foreach (string text in array3) {
+-				if (!string.IsNullOrWhiteSpace(text) && text.Length >= 1) {
+-					num++;
++			*/
++
++			foreach (string text in words)
++			{
++				// TODO: When would length ever be less than 1?
++				if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
++				{
++					continue;
+ 				}
++
++				wordCount++;
+ 			}
+ 		}
++
+-		return num;
++		return wordCount;
+ 	}
+ 
++	// Seems to serve as a soft reset when switching languages.
+ 	private void SetAllTextValuesToKeys()
+ 	{
+-		foreach (KeyValuePair<string, LocalizedText> localizedText in _localizedTexts) {
+-			localizedText.Value.SetValue(localizedText.Key);
++		foreach (KeyValuePair<string, LocalizedText> localizedText in localizedTexts)
++		{
++			localizedText.Value.Value = localizedText.Key;
+ 		}
+ 	}
+ 
+-	private string[] GetLanguageFilesForCulture(GameCulture culture)
++	private static string[] GetLanguageFilesForCulture(GameCulture culture)
+ 	{
++		// TODO: Is this call necessary? (It obviously isn't.)
+-		Assembly.GetExecutingAssembly();
++		// Assembly.GetExecutingAssembly();
+-		return Array.FindAll(typeof(Program).Assembly.GetManifestResourceNames(), (string element) => element.StartsWith("Terraria.Localization.Content." + culture.CultureInfo.Name.Replace('-', '_')) && element.EndsWith(".json"));
++		return Array.FindAll(typeof(Program).Assembly.GetManifestResourceNames(), element => element.StartsWith("Terraria.Localization.Content." + culture.CultureInfo.Name.Replace('-', '_')) && element.EndsWith(".json"));
+ 	}
+ 
+ 	public void SetLanguage(GameCulture culture)
+ 	{
+-		if (ActiveCulture != culture) {
+-			if (culture != _fallbackCulture && ActiveCulture != _fallbackCulture) {
+-				SetAllTextValuesToKeys();
+-				LoadLanguage(_fallbackCulture);
+-			}
+-			LoadLanguage(culture);
+-			ActiveCulture = culture;
+-			Thread.CurrentThread.CurrentCulture = culture.CultureInfo;
+-			Thread.CurrentThread.CurrentUICulture = culture.CultureInfo;
+-			if (this.OnLanguageChanged != null) {
+-				this.OnLanguageChanged(this);
+-			}
+-			_ = FontAssets.DeathText;
+-		}
++		// No need to change if we're using the requested culture!
++		if (ActiveCulture == culture)
++		{
++			return;
++		}
++
++		// If the requested culture is not the fallback culture AND the active culture is not the fallback culture,
++		// set all values to keys and load the fallback culture, *then* load the requested culture like normal.
++		// This seems to just be done to prioritize loading the fallback culture as, well, a fallback.
++		if (culture != fallbackCulture && ActiveCulture != fallbackCulture)
++		{
++			SetAllTextValuesToKeys();
++			LoadLanguage(fallbackCulture);
++		}
++
++		LoadLanguage(culture);
++		ActiveCulture = culture;
++
++		// TODO: What about other threads?
++		Thread.CurrentThread.CurrentCulture = culture.CultureInfo;
++		Thread.CurrentThread.CurrentUICulture = culture.CultureInfo;
++
++		OnLanguageChanged?.Invoke(this);
++
++		// TODO: Why the discard?
++		// _ = FontAssets.DeathText;
+ 	}
+ 
+ 	private void LoadLanguage(GameCulture culture, bool processCopyCommands = true)
+ 	{
+ 		LoadFilesForCulture(culture);
+-		if (this.OnLanguageChanging != null) {
+-			this.OnLanguageChanging(this);
+-		}
+-		if (processCopyCommands) {
++		OnLanguageChanging?.Invoke(this);
++		
++		if (processCopyCommands)
++		{
+ 			ProcessCopyCommandsInTexts();
+ 		}
++
+ 		ChatInitializer.PrepareAliases();
+ 	}
+ 
+ 	private void LoadFilesForCulture(GameCulture culture)
+ 	{
+ 		string[] languageFilesForCulture = GetLanguageFilesForCulture(culture);
+-		foreach (string text in languageFilesForCulture) {
+-			try {
+-				string text2 = Utils.ReadEmbeddedResource(text);
+-				if (text2 == null || text2.Length < 2) {
++		foreach (string files in languageFilesForCulture)
++		{
++			try
++			{
++				string languageFile = Utils.ReadEmbeddedResource(files);
++				
++				// NOTE: 2 is the smallest valid JSON file ({} or []).
++				if (languageFile == null || languageFile.Length < 2)
++				{
+ 					throw new FormatException();
+ 				}
+-				LoadLanguageFromFileTextJson(text2, canCreateCategories: true);
+-			} catch (Exception) {
+-				if (Debugger.IsAttached) {
++
++				LoadLanguageFromFileTextJson(languageFile, canCreateCategories: true);
++			}
++			catch (Exception)
++			{
++				// No need.
++				/*if (Debugger.IsAttached)
++				{
+ 					Debugger.Break();
+-				}
+-				Console.WriteLine("Failed to load language file: " + text);
++				}*/
++
++				// TODO: Should we treat this as something worse? Why were they breaking BTW, lol?
++				Console.WriteLine("Failed to load language file: " + files);
+ 				break;
+ 			}
+ 		}
+@@ -146,15 +_,24 @@
+ 
+ 	private void ProcessCopyCommandsInTexts()
+ 	{
+-		Regex regex = new Regex("{\\$(\\w+\\.\\w+)}", RegexOptions.Compiled);
+-		foreach (KeyValuePair<string, LocalizedText> localizedText in _localizedTexts) {
+-			LocalizedText value = localizedText.Value;
+-			for (int i = 0; i < 100; i++) {
+-				string text = regex.Replace(value.Value, (Match match) => GetTextValue(match.Groups[1].ToString()));
+-				if (text == value.Value) {
++		// TODO: Where is this actually used? Such weird, hidden localization syntax features.
++		Regex copyCommandRegex = CopyCommandRegex();
++
++		foreach (KeyValuePair<string, LocalizedText> localizedText in localizedTexts)
++		{
++			LocalizedText text = localizedText.Value;
++
++			for (int i = 0; i < 100; i++)
++			{
++				string value = copyCommandRegex.Replace(text.Value, (Match match) => GetTextValue(match.Groups[1].ToString()));
++
++				// Don't care if it's already equal.
++				if (value == text.Value)
++				{
+ 					break;
+ 				}
+-				value.SetValue(text);
++
++				text.Value = value;
+ 			}
+ 		}
+ 	}
+@@ -164,32 +_,49 @@
+ 		string name = ActiveCulture.Name;
+ 		string assetNameStart = ("Localization" + Path.DirectorySeparatorChar + name).ToLower();
+ 		LoadLanguage(ActiveCulture, processCopyCommands: false);
++
+-		foreach (IContentSource item in sourcesFromLowestToHighest) {
++		foreach (IContentSource item in sourcesFromLowestToHighest)
++		{
+-			foreach (string item2 in item.GetAllAssetsStartingWith(assetNameStart)) {
++			foreach (string item2 in item.GetAllAssetsStartingWith(assetNameStart))
++			{
+ 				string extension = item.GetExtension(item2);
++
+-				if (!(extension == ".json") && !(extension == ".csv")) {
++				if (!(extension == ".json") && !(extension == ".csv"))
++				{
+ 					continue;
+ 				}
++
+ 				using Stream stream = item.OpenStream(item2);
+-				using StreamReader streamReader = new StreamReader(stream);
++				using StreamReader streamReader = new(stream);
+ 				string fileText = streamReader.ReadToEnd();
++
+-				if (extension == ".json") {
++				if (extension == ".json")
++				{
+ 					LoadLanguageFromFileTextJson(fileText, canCreateCategories: false);
+ 				}
+-				if (extension == ".csv") {
+-					LoadLanguageFromFileTextCsv(fileText);
++
++				// TODO: I don't think there are used, like, ever. Also, ew, gross, CSV.
++				if (extension == ".csv")
++				{
++					// LoadLanguageFromFileTextCsv(fileText);
++					
++					// TODO: Throw? We're removing a feature here.
++					continue;
+ 				}
+ 			}
+ 		}
++
+ 		ProcessCopyCommandsInTexts();
+ 		ChatInitializer.PrepareAliases();
+ 	}
+ 
++	// Don't feel like supporting this; useless.
+-	public void LoadLanguageFromFileTextCsv(string fileText)
++	/*public void LoadLanguageFromFileTextCsv(string fileText)
+ 	{
+ 		using TextReader reader = new StringReader(fileText);
+ 		using CsvReader csvReader = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true });
+-		if (!csvReader.ReadHeader()) {
++		if (!csvReader.ReadHeader())
++		{
+ 			return;
+ 		}
+ 		string[] fieldHeaders = new string[csvReader.Parser.Count];
+@@ -197,44 +_,62 @@
+ 			fieldHeaders[i] = csvReader.Parser[i];
+ 		int num = -1;
+ 		int num2 = -1;
+-		for (int i = 0; i < fieldHeaders.Length; i++) {
++		for (int i = 0; i < fieldHeaders.Length; i++)
++		{
+ 			string text = fieldHeaders[i].ToLower();
+-			if (text == "translation") {
++			if (text == "translation")
++			{
+ 				num2 = i;
+ 			}
+-			if (text == "key") {
++			if (text == "key")
++			{
+ 				num = i;
+ 			}
+ 		}
+-		if (num == -1 || num2 == -1) {
++		if (num == -1 || num2 == -1)
++		{
+ 			return;
+ 		}
+ 		int num3 = Math.Max(num, num2) + 1;
+-		foreach (string[] currentRecord in csvReader.GetRecords<string[]>())  {
++		foreach (string[] currentRecord in csvReader.GetRecords<string[]>())
++		{
+-			if (currentRecord.Length >= num3) {
++			if (currentRecord.Length >= num3)
++			{
+ 				string text2 = currentRecord[num];
+ 				string value = currentRecord[num2];
+-				if (!string.IsNullOrWhiteSpace(text2) && !string.IsNullOrWhiteSpace(value) && _localizedTexts.ContainsKey(text2)) {
+-					_localizedTexts[text2].SetValue(value);
++				if (!string.IsNullOrWhiteSpace(text2) && !string.IsNullOrWhiteSpace(value) && localizedTexts.ContainsKey(text2))
++				{
++					localizedTexts[text2].Value = value;
+ 				}
+ 			}
+ 		}
+-	}
++	}*/
+ 
+ 	public void LoadLanguageFromFileTextJson(string fileText, bool canCreateCategories)
+ 	{
+-		foreach (KeyValuePair<string, Dictionary<string, string>> item in JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(fileText)) {
+-			_ = item.Key;
+-			foreach (KeyValuePair<string, string> item2 in item.Value) {
++		foreach (KeyValuePair<string, Dictionary<string, string>> item in JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(fileText))
++		{
++			// _ = item.Key;
++
++			foreach (KeyValuePair<string, string> item2 in item.Value)
++			{
+ 				string key = item.Key + "." + item2.Key;
+-				if (_localizedTexts.ContainsKey(key)) {
+-					_localizedTexts[key].SetValue(item2.Value);
+-				} else if (canCreateCategories) {
+-					_localizedTexts.Add(key, new LocalizedText(key, item2.Value));
+-					if (!_categoryGroupedKeys.ContainsKey(item.Key)) {
+-						_categoryGroupedKeys.Add(item.Key, new List<string>());
++
++				if (localizedTexts.TryGetValue(key, out LocalizedText text))
++				{
++					text.Value = item2.Value;
++				}
++				else if (canCreateCategories)
++				{
++					localizedTexts.Add(key, new LocalizedText(key, item2.Value));
++
++					if (!categoryGroupedKeys.TryGetValue(item.Key, out List<string> value))
++					{
++						value = new List<string>();
++						categoryGroupedKeys.Add(item.Key, value);
+ 					}
+-					_categoryGroupedKeys[item.Key].Add(item2.Key);
++
++					value.Add(item2.Key);
+ 				}
+ 			}
+ 		}
+@@ -243,142 +_,109 @@
+ 	[Conditional("DEBUG")]
+ 	private void ValidateAllCharactersContainedInFont(DynamicSpriteFont font)
+ 	{
+-		if (font == null) {
++		if (font == null)
++		{
+ 			return;
+ 		}
++
+ 		string text = "";
+-		foreach (LocalizedText value2 in _localizedTexts.Values) {
+-			string value = value2.Value;
+-			for (int i = 0; i < value.Length; i++) {
++
++		foreach (LocalizedText localizedText in localizedTexts.Values)
++		{
++			string value = localizedText.Value;
++
++			for (int i = 0; i < value.Length; i++)
++			{
+ 				char c = value[i];
+-				if (!font.IsCharacterSupported(c)) {
+-					text = text + value2.Key + ", " + c.ToString() + ", " + (int)c + "\n";
+-				}
+-			}
+-		}
+-	}
+ 
+-	public LocalizedText[] FindAll(Regex regex)
+-	{
+-		int num = 0;
+-		foreach (KeyValuePair<string, LocalizedText> localizedText in _localizedTexts) {
+-			if (regex.IsMatch(localizedText.Key)) {
+-				num++;
+-			}
+-		}
+-		LocalizedText[] array = new LocalizedText[num];
+-		int num2 = 0;
+-		foreach (KeyValuePair<string, LocalizedText> localizedText2 in _localizedTexts) {
+-			if (regex.IsMatch(localizedText2.Key)) {
+-				array[num2] = localizedText2.Value;
+-				num2++;
+-			}
+-		}
+-		return array;
++				if (!font.IsCharacterSupported(c))
++				{
++					text = text + localizedText.Key + ", " + c.ToString() + ", " + (int)c + "\n";
++				}
++			}
++		}
+ 	}
+ 
+ 	public LocalizedText[] FindAll(LanguageSearchFilter filter)
+ 	{
+-		LinkedList<LocalizedText> linkedList = new LinkedList<LocalizedText>();
+-		foreach (KeyValuePair<string, LocalizedText> localizedText in _localizedTexts) {
+-			if (filter(localizedText.Key, localizedText.Value)) {
+-				linkedList.AddLast(localizedText.Value);
++		List<LocalizedText> list = new List<LocalizedText>();
++
++		foreach (KeyValuePair<string, LocalizedText> localizedText in localizedTexts)
++		{
++			if (filter(localizedText.Key, localizedText.Value))
++			{
++				list.Add(localizedText.Value);
+ 			}
+ 		}
++
+-		return linkedList.ToArray();
++		return list.ToArray();
+ 	}
+ 
+ 	public LocalizedText SelectRandom(LanguageSearchFilter filter, UnifiedRandom random = null)
+ 	{
+-		int num = 0;
+-		foreach (KeyValuePair<string, LocalizedText> localizedText in _localizedTexts) {
+-			if (filter(localizedText.Key, localizedText.Value)) {
+-				num++;
++		int matches = 0;
++
++		foreach (KeyValuePair<string, LocalizedText> localizedText in localizedTexts)
++		{
++			if (filter(localizedText.Key, localizedText.Value))
++			{
++				matches++;
+ 			}
+ 		}
+-		int num2 = (random ?? Main.rand).Next(num);
+-		foreach (KeyValuePair<string, LocalizedText> localizedText2 in _localizedTexts) {
+-			if (filter(localizedText2.Key, localizedText2.Value) && --num == num2) {
++
++		int matchCount = (random ?? Main.rand).Next(matches);
++
++		foreach (KeyValuePair<string, LocalizedText> localizedText2 in localizedTexts)
++		{
++			if (filter(localizedText2.Key, localizedText2.Value) && --matches == matchCount)
++			{
+ 				return localizedText2.Value;
+ 			}
+ 		}
++
+-		return LocalizedText.Empty;
++		return LocalizedText.EMPTY;
+ 	}
+ 
+ 	public LocalizedText RandomFromCategory(string categoryName, UnifiedRandom random = null)
+ 	{
+-		if (!_categoryGroupedKeys.ContainsKey(categoryName)) {
++		if (!categoryGroupedKeys.TryGetValue(categoryName, out List<string> value))
++		{
+ 			return new LocalizedText(categoryName + ".RANDOM", categoryName + ".RANDOM");
+ 		}
+-		List<string> list = _categoryGroupedKeys[categoryName];
+-		return GetText(categoryName + "." + list[(random ?? Main.rand).Next(list.Count)]);
++
++		return GetText(categoryName + "." + value[(random ?? Main.rand).Next(value.Count)]);
+ 	}
+ 
+ 	public LocalizedText IndexedFromCategory(string categoryName, int index)
+ 	{
+-		if (!_categoryGroupedKeys.ContainsKey(categoryName)) {
++		if (!categoryGroupedKeys.TryGetValue(categoryName, out List<string> value))
++		{
+ 			return new LocalizedText(categoryName + ".INDEXED", categoryName + ".INDEXED");
+ 		}
+-		List<string> list = _categoryGroupedKeys[categoryName];
+-		int index2 = index % list.Count;
+-		return GetText(categoryName + "." + list[index2]);
++
++		return GetText(categoryName + "." + value[index % value.Count]);
+ 	}
+ 
+ 	public bool Exists(string key)
+ 	{
+-		return _localizedTexts.ContainsKey(key);
++		return localizedTexts.ContainsKey(key);
+ 	}
+ 
+ 	public LocalizedText GetText(string key)
+ 	{
+-		if (!_localizedTexts.ContainsKey(key)) {
+-			return new LocalizedText(key, key);
+-		}
+-		return _localizedTexts[key];
+-	}
+-
+-	public string GetTextValue(string key)
+-	{
+-		if (_localizedTexts.ContainsKey(key)) {
+-			return _localizedTexts[key].Value;
+-		}
+-		return key;
+-	}
+-
+-	public string GetTextValue(string key, object arg0)
+-	{
+-		if (_localizedTexts.ContainsKey(key)) {
+-			return _localizedTexts[key].Format(arg0);
+-		}
+-		return key;
+-	}
+-
+-	public string GetTextValue(string key, object arg0, object arg1)
+-	{
+-		if (_localizedTexts.ContainsKey(key)) {
+-			return _localizedTexts[key].Format(arg0, arg1);
+-		}
+-		return key;
+-	}
+-
+-	public string GetTextValue(string key, object arg0, object arg1, object arg2)
+-	{
+-		if (_localizedTexts.ContainsKey(key)) {
+-			return _localizedTexts[key].Format(arg0, arg1, arg2);
+-		}
+-		return key;
++		return !localizedTexts.TryGetValue(key, out LocalizedText value) ? new LocalizedText(key, key) : value;
+ 	}
+ 
+ 	public string GetTextValue(string key, params object[] args)
+ 	{
+-		if (_localizedTexts.ContainsKey(key)) {
+-			return _localizedTexts[key].Format(args);
+-		}
+-		return key;
++		return localizedTexts.TryGetValue(key, out LocalizedText value) ? args.Length == 0 ? value.Value : value.Format(args) : key;
+ 	}
+ 
+ 	public void SetFallbackCulture(GameCulture culture)
+ 	{
+-		_fallbackCulture = culture;
++		fallbackCulture = culture;
+ 	}
++
++	[GeneratedRegex("{\\$(\\w+\\.\\w+)}", RegexOptions.Compiled)]
++	private static partial Regex CopyCommandRegex();
+ }

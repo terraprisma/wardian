@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/Program.cs
++++ decompiled/Wardian/Terraria/Program.cs
+@@ -175,7 +_,7 @@
+ 
+ 	public static void RunGame()
+ 	{
+-		LanguageManager.Instance.SetLanguage(GameCulture.DefaultCulture);
++		LanguageManager.INSTANCE.SetLanguage(GameCulture.DefaultCulture);
+ 		if (Platform.IsOSX) {
+ 			Main.OnEngineLoad += delegate {
+ 				Main.instance.IsMouseVisible = false;

@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/GameContent/AssetSourceController.cs
++++ decompiled/Wardian/Terraria/GameContent/AssetSourceController.cs
+@@ -52,7 +_,7 @@
+ 			list2.Add(list[num]);
+ 		}
+ 		_assetRepository.SetSources(list);
+-		LanguageManager.Instance.UseSources(list2);
++		LanguageManager.INSTANCE.UseSources(list2);
+ 		Main.audioSystem.UseSources(list2);
+ 		SoundEngine.Reload();
+ 		Main.changeTheTitle = true;

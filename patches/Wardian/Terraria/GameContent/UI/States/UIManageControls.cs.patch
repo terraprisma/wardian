@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/Terraria/GameContent/UI/States/UIManageControls.cs
++++ decompiled/Wardian/Terraria/GameContent/UI/States/UIManageControls.cs
+@@ -293,7 +_,7 @@
+ 		}
+ 		CreateElementGroup(uIList, bindings, currentInputMode, uIPanel.BackgroundColor);
+ 		uIPanel.BackgroundColor = uIPanel.BackgroundColor.MultiplyRGBA(new Color(111, 111, 111));
+-		LocalizedText text = LocalizedText.Empty;
++		LocalizedText text = LocalizedText.EMPTY;
+ 		switch (elementIndex) {
+ 			case 0:
+ 				text = ((currentInputMode == InputMode.Keyboard || currentInputMode == InputMode.XBoxGamepad) ? Lang.menu[164] : Lang.menu[243]);

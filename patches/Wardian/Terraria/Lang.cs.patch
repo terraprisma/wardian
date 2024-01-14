@@ -1,0 +1,114 @@
+--- decompiled/TerrariaUnified/Terraria/Lang.cs
++++ decompiled/Wardian/Terraria/Lang.cs
+@@ -151,7 +_,7 @@
+ 		if (netID < 0 && -netID - 1 < _negativeNpcNameCache.Length) {
+ 			return _negativeNpcNameCache[-netID - 1];
+ 		}
+-		return LocalizedText.Empty;
++		return LocalizedText.EMPTY;
+ 	}
+ 
+ 	public static ItemTooltip GetTooltip(int itemId)
+@@ -165,7 +_,7 @@
+ 		if (id > 0 && id < ItemID.Count && _itemNameCache[id] != null) {
+ 			return _itemNameCache[id];
+ 		}
+-		return LocalizedText.Empty;
++		return LocalizedText.EMPTY;
+ 	}
+ 
+ 	public static LocalizedText GetEmojiName(int id)
+@@ -173,7 +_,7 @@
+ 		if (id >= 0 && id < EmoteID.Count && _emojiNameCache[id] != null) {
+ 			return _emojiNameCache[id];
+ 		}
+-		return LocalizedText.Empty;
++		return LocalizedText.EMPTY;
+ 	}
+ 
+ 	public static string GetItemNameValue(int id)
+@@ -385,22 +_,22 @@
+ 		if (type >= 0 && type < _projectileNameCache.Length && _projectileNameCache[type] != null) {
+ 			return _projectileNameCache[type];
+ 		}
+-		return LocalizedText.Empty;
++		return LocalizedText.EMPTY;
+ 	}
+ 
+ 	private static void FillNameCacheArray<IdClass, IdType>(string category, LocalizedText[] nameCache, bool leaveMissingEntriesBlank = false) where IdType : IConvertible
+ 	{
+ 		for (int i = 0; i < nameCache.Length; i++) {
+-			nameCache[i] = LocalizedText.Empty;
++			nameCache[i] = LocalizedText.EMPTY;
+ 		}
+ 		(from f in typeof(IdClass).GetFields(BindingFlags.Static | BindingFlags.Public)
+ 			where f.FieldType == typeof(IdType)
+ 			select f).ToList().ForEach(delegate(FieldInfo field) {
+ 			long num = Convert.ToInt64((IdType)field.GetValue(null));
+ 			if (num >= 0 && num < nameCache.Length) {
+-				nameCache[num] = ((!leaveMissingEntriesBlank || Language.Exists(category + "." + field.Name)) ? Language.GetText(category + "." + field.Name) : LocalizedText.Empty);
++				nameCache[num] = ((!leaveMissingEntriesBlank || Language.Exists(category + "." + field.Name)) ? Language.GetText(category + "." + field.Name) : LocalizedText.EMPTY);
+ 			} else if (field.Name == "None") {
+-				nameCache[num] = LocalizedText.Empty;
++				nameCache[num] = LocalizedText.EMPTY;
+ 			}
+ 		});
+ 	}
+@@ -510,7 +_,7 @@
+ 		}
+ 		_mapLegendCache = new LocalizedText[MapHelper.LookupCount()];
+ 		for (int i = 0; i < _mapLegendCache.Length; i++) {
+-			_mapLegendCache[i] = LocalizedText.Empty;
++			_mapLegendCache[i] = LocalizedText.EMPTY;
+ 		}
+ 		for (int j = 0; j < TileID.Sets.IsATreeTrunk.Length; j++) {
+ 			if (TileID.Sets.IsATreeTrunk[j]) {
+@@ -932,10 +_,10 @@
+ 
+ 	public static NetworkText CreateDeathMessage(string deadPlayerName, int plr = -1, int npc = -1, int proj = -1, int other = -1, int projType = 0, int plrItemType = 0)
+ 	{
+-		NetworkText networkText = NetworkText.Empty;
++		NetworkText networkText = NetworkText.EMPTY;
+-		NetworkText networkText2 = NetworkText.Empty;
++		NetworkText networkText2 = NetworkText.EMPTY;
+-		NetworkText networkText3 = NetworkText.Empty;
++		NetworkText networkText3 = NetworkText.EMPTY;
+-		NetworkText networkText4 = NetworkText.Empty;
++		NetworkText networkText4 = NetworkText.EMPTY;
+ 		if (proj >= 0) {
+ 			networkText = NetworkText.FromKey(GetProjectileName(projType).Key);
+ 		}
+@@ -948,11 +_,11 @@
+ 		if (plrItemType >= 0) {
+ 			networkText4 = NetworkText.FromKey(GetItemName(plrItemType).Key);
+ 		}
+-		bool flag = networkText != NetworkText.Empty;
++		bool flag = networkText != NetworkText.EMPTY;
+ 		bool flag2 = plr >= 0 && plr < 255;
+-		bool flag3 = networkText2 != NetworkText.Empty;
++		bool flag3 = networkText2 != NetworkText.EMPTY;
+-		NetworkText result = NetworkText.Empty;
++		NetworkText result = NetworkText.EMPTY;
+-		NetworkText empty = NetworkText.Empty;
++		NetworkText empty = NetworkText.EMPTY;
+ 		empty = NetworkText.FromKey(Language.RandomFromCategory("DeathTextGeneric").Key, deadPlayerName, Main.worldName);
+ 		if (flag2) {
+ 			result = NetworkText.FromKey("DeathSource.Player", empty, networkText3, flag ? networkText : networkText4);
+@@ -1023,7 +_,7 @@
+ 					result = NetworkText.FromKey("DeathText.Space_" + (Main.rand.Next(5) + 1), deadPlayerName, Main.worldName);
+ 					break;
+ 				case 254:
+-					result = NetworkText.Empty;
++					result = NetworkText.EMPTY;
+ 					break;
+ 				case 255:
+ 					result = NetworkText.FromKey("DeathText.Slain", deadPlayerName);
+@@ -1058,7 +_,7 @@
+ 	public static string LocalizedDuration(TimeSpan time, bool abbreviated, bool showAllAvailableUnits)
+ 	{
+ 		string text = "";
+-		abbreviated |= !GameCulture.FromCultureName(GameCulture.CultureName.English).IsActive;
++		abbreviated |= !Languages.English.IsActive;
+ 		if (time.Days > 0) {
+ 			int num = time.Days;
+ 			if (!showAllAvailableUnits && time > TimeSpan.FromDays(1.0)) {
