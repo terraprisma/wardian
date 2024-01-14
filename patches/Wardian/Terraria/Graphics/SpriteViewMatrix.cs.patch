@@ -6,7 +6,7 @@
  		_transformationMatrix = identity * _zoomMatrix;
 -		_normalizedTransformationMatrix = Matrix.Invert(identity) * _zoomMatrix * matrix;
 +		Matrix.Invert(identity, out Matrix result);
-+        _normalizedTransformationMatrix = result * _zoomMatrix * matrix;
++		_normalizedTransformationMatrix = result * _zoomMatrix * matrix;
  		_needsRebuild = false;
  	}
  

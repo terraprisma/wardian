@@ -6,7 +6,7 @@
  			graphicsDevice.Clear(clearColor);
 +			Matrix.Invert(Main.GameViewMatrix.EffectMatrix, out Matrix matrix);
 -			Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Invert(Main.GameViewMatrix.EffectMatrix));
-+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
++			Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, matrix);
  			Main.spriteBatch.Draw(renderTarget2D2, Vector2.Zero, Color.White);
  			Main.spriteBatch.End();
  			renderTarget2D2 = screenTarget2;
