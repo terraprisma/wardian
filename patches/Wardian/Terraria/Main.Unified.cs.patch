@@ -1,0 +1,9 @@
+--- decompiled/TerrariaUnified/Terraria/Main.Unified.cs
++++ decompiled/Wardian/Terraria/Main.Unified.cs
+@@ -9,5 +_,5 @@
+ 
+ 	internal static List<TitleLinkButton> unifiedLinks = new List<TitleLinkButton>();
+ 
+-	internal const bool unifiedBranding = true;
++	internal const bool unifiedBranding = false;
+ }

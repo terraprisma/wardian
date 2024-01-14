@@ -1,3 +1,6 @@
 [submodule "unified"]
 	path = unified
 	url = https://github.com/terraprisma/unified.git
+[submodule "FNA"]
+	path = FNA
+	url = https://github.com/steviegt6/FNA

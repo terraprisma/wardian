@@ -1,0 +1,13 @@
+{
+  "dependencies": ["unified/patches.json"],
+  "nodes": [
+    {
+      "kind": "mod",
+      "name": "Wardian",
+      "patchDir": "patches/Wardian",
+      "parent": "TerrariaUnified",
+      "data": {},
+      "children": []
+    }
+  ]
+}
