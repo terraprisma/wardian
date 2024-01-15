@@ -1,5 +1,17 @@
 --- decompiled/TerrariaUnified/Terraria/Main.cs
 +++ decompiled/Wardian/Terraria/Main.cs
+@@ -1875,9 +_,9 @@
+ 
+ 	public static bool Support4K = true;
+ 
+-	public static float MinimumZoomComparerX = 1920f;
++	public static float MinimumZoomComparerX = 8192f; // 1920f;
+ 
+-	public static float MinimumZoomComparerY = 1200f;
++	public static float MinimumZoomComparerY = 8192f; // 1200f;
+ 
+ 	private static int _renderTargetMaxSize = 2048;
+ 
 @@ -3828,13 +_,18 @@
  		configuration.Get("AutoPause", ref autoPause);
  		_needsLanguageSelect = !configuration.Contains("Language");
