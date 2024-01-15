@@ -1,0 +1,11 @@
+--- decompiled/TerrariaUnified/ReLogic/ReLogic.csproj
++++ decompiled/Wardian/ReLogic/ReLogic.csproj
+@@ -18,8 +_,4 @@
+         <ProjectReference Include="../../../FNA/FNA.csproj"/>
+     </ItemGroup>
+ 
+-    <ItemGroup>
+-        <EmbeddedResource Include="Microsoft/**"/>
+-    </ItemGroup>
+-
+ </Project>

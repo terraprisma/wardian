@@ -1,0 +1,336 @@
+--- decompiled/TerrariaUnified/ReLogic/Utilities/SlotVector.cs
++++ decompiled/Wardian/ReLogic/Utilities/SlotVector.cs
+@@ -2,51 +_,59 @@
+ using System.Collections;
+ using System.Collections.Generic;
+ 
++// TODO: (Minor) summaries.
++
+ namespace ReLogic.Utilities;
+ 
++/// <summary>
++///		TODO; <see cref="SlotId"/>.
++/// </summary>
++/// <typeparam name="T"></typeparam>
+ public sealed class SlotVector<T> : IEnumerable<SlotVector<T>.ItemPair>, IEnumerable
+ {
+-	public sealed class Enumerator : IEnumerator<ItemPair>, IDisposable, IEnumerator
++	private sealed class Enumerator : IEnumerator<ItemPair>, IDisposable, IEnumerator
+ 	{
+-		private SlotVector<T> _slotVector;
++		private SlotVector<T> vector;
+-
+-		private int _index = -1;
++		private int index = -1;
+ 
+-		ItemPair IEnumerator<ItemPair>.Current => _slotVector.GetPair(_index);
++		ItemPair IEnumerator<ItemPair>.Current => vector.GetPair(index);
+ 
+-		object IEnumerator.Current => _slotVector.GetPair(_index);
++		object IEnumerator.Current => vector.GetPair(index);
+ 
+ 		public Enumerator(SlotVector<T> slotVector)
+ 		{
+-			_slotVector = slotVector;
++			vector = slotVector;
+ 		}
+ 
+ 		public void Reset()
+ 		{
+-			_index = -1;
++			index = -1;
+ 		}
+ 
+ 		public bool MoveNext()
+ 		{
+-			while (++_index < _slotVector._usedSpaceLength) {
+-				if (_slotVector.Has(_index)) {
++			while (++index < vector.usedSpaceLength)
++			{
++				if (vector.Has(index))
++				{
+ 					return true;
+ 				}
+ 			}
++
+ 			return false;
+ 		}
+ 
+ 		public void Dispose()
+ 		{
+-			_slotVector = null;
++			vector = null;
+ 		}
+ 	}
+ 
+-	public struct ItemPair
++	public readonly struct ItemPair
+ 	{
+-		public readonly T Value;
++		public T Value { get; }
+ 
+-		public readonly SlotId Id;
++		public SlotId Id { get; }
+ 
+ 		public ItemPair(T value, SlotId id)
+ 		{
+@@ -55,136 +_,180 @@
+ 		}
+ 	}
+ 
+-	private const uint MAX_INDEX = 65535u;
+-
+-	private readonly ItemPair[] _array;
+-
+-	private uint _freeHead;
+-
+-	private uint _usedSpaceLength;
+-
+-	public T this[int index] {
+-		get {
+-			if (index < 0 || index >= _array.Length) {
+-				throw new ArgumentOutOfRangeException();
+-			}
+-			if (!_array[index].Id.IsActive) {
+-				throw new KeyNotFoundException();
+-			}
+-			return _array[index].Value;
++	private const uint max_index = 65535;
++
++	private readonly ItemPair[] array;
++	private uint freeHead;
++	private uint usedSpaceLength;
++
++	public T this[int index]
++	{
++		get
++		{
++			if (index < 0 || index >= array.Length)
++			{
++				throw new ArgumentOutOfRangeException(nameof(index));
++			}
++
++			if (!array[index].Id.IsActive)
++			{
++				throw new KeyNotFoundException(nameof(index));
++			}
++
++			return array[index].Value;
+ 		}
+-		set {
+-			if (index < 0 || index >= _array.Length) {
+-				throw new ArgumentOutOfRangeException();
+-			}
+-			if (!_array[index].Id.IsActive) {
+-				throw new KeyNotFoundException();
+-			}
+-			_array[index] = new ItemPair(value, _array[index].Id);
++
++		set
++		{
++			if (index < 0 || index >= array.Length)
++			{
++				throw new ArgumentOutOfRangeException(nameof(index));
++			}
++
++			if (!array[index].Id.IsActive)
++			{
++				throw new KeyNotFoundException(nameof(index));
++			}
++
++			array[index] = new ItemPair(value, array[index].Id);
+ 		}
+ 	}
+ 
+-	public T this[SlotId id] {
+-		get {
++	public T this[SlotId id]
++	{
++		get
++		{
+ 			uint index = id.Index;
+-			if (index >= _array.Length) {
+-				throw new ArgumentOutOfRangeException();
+-			}
+-			if (!_array[index].Id.IsActive || id != _array[index].Id) {
+-				throw new KeyNotFoundException();
+-			}
+-			return _array[index].Value;
++
++			if (index >= array.Length)
++			{
++				throw new ArgumentOutOfRangeException(nameof(id));
++			}
++
++			if (!array[index].Id.IsActive || id != array[index].Id)
++			{
++				throw new KeyNotFoundException(nameof(id));
++			}
++
++			return array[index].Value;
+ 		}
+-		set {
++
++		set
++		{
+ 			uint index = id.Index;
+-			if (index >= _array.Length) {
+-				throw new ArgumentOutOfRangeException();
+-			}
+-			if (!_array[index].Id.IsActive || id != _array[index].Id) {
+-				throw new KeyNotFoundException();
+-			}
+-			_array[index] = new ItemPair(value, id);
++
++			if (index >= array.Length)
++			{
++				throw new ArgumentOutOfRangeException(nameof(id));
++			}
++
++			if (!array[index].Id.IsActive || id != array[index].Id)
++			{
++				throw new KeyNotFoundException(nameof(id));
++			}
++
++			array[index] = new ItemPair(value, id);
+ 		}
+ 	}
+ 
+ 	public int Count { get; private set; }
+ 
+-	public int Capacity => _array.Length;
++	public int Capacity => array.Length;
+ 
+ 	public SlotVector(int capacity)
+ 	{
+-		_array = new ItemPair[capacity];
++		array = new ItemPair[capacity];
+ 		Clear();
+ 	}
+ 
+ 	public SlotId Add(T value)
+ 	{
+-		if (_freeHead == 65535) {
+-			return new SlotId(65535u);
+-		}
+-		uint freeHead = _freeHead;
+-		ItemPair itemPair = _array[freeHead];
+-		if (_freeHead >= _usedSpaceLength) {
+-			_usedSpaceLength = _freeHead + 1;
+-		}
+-		_freeHead = itemPair.Id.Index;
+-		_array[freeHead] = new ItemPair(value, itemPair.Id.ToActive(freeHead));
++		if (freeHead == max_index)
++		{
++			return new SlotId(max_index);
++		}
++
++		uint oldHead = freeHead;
++		ItemPair pair = array[oldHead];
++		
++		// Update used space if needed.
++		if (freeHead >= usedSpaceLength)
++		{
++			usedSpaceLength = freeHead + 1;
++		}
++
++		// Update to next free head, set old head to the new item pair.
++		freeHead = pair.Id.Index;
++		array[oldHead] = new ItemPair(value, pair.Id.ToActive(oldHead));
+ 		Count++;
+-		return _array[freeHead].Id;
++		return array[oldHead].Id;
+ 	}
+ 
+ 	public void Clear()
+ 	{
+-		_usedSpaceLength = 0u;
++		usedSpaceLength = 0;
+ 		Count = 0;
+-		_freeHead = 0u;
+-		for (uint num = 0u; num < _array.Length - 1; num++) {
+-			_array[num] = new ItemPair(default(T), new SlotId(num + 1));
++		freeHead = 0;
++
++		for (int i = 0; i < array.Length - 1; i++)
++		{
++			array[i] = new ItemPair(default, new SlotId((uint)i + 1));
+ 		}
+-		_array[_array.Length - 1] = new ItemPair(default(T), new SlotId(65535u));
++
++		array[^1] = new ItemPair(default, new SlotId(max_index));
+ 	}
+ 
+ 	public bool Remove(SlotId id)
+ 	{
+-		if (id.IsActive) {
+-			uint index = id.Index;
+-			_array[index] = new ItemPair(default(T), id.ToInactive(_freeHead));
+-			_freeHead = index;
+-			Count--;
+-			return true;
++		if (!id.IsActive)
++		{
++			return false;
+ 		}
++
++		array[id.Index] = new ItemPair(default, id.ToInactive(freeHead));
++		freeHead = id.Index;
++		Count--;
+-		return false;
++		return true;
+ 	}
+ 
+ 	public bool Has(SlotId id)
+ 	{
+-		uint index = id.Index;
+-		if (index >= _array.Length) {
+-			return false;
+-		}
+-		if (!_array[index].Id.IsActive || id != _array[index].Id) {
+-			return false;
+-		}
++		if (id.Index >= array.Length)
++		{
++			return false;
++		}
++
++		if (!array[id.Index].Id.IsActive || id != array[id.Index].Id)
++		{
++			return false;
++		}
++
+ 		return true;
+ 	}
+ 
+ 	public bool Has(int index)
+ 	{
+-		if (index < 0 || index >= _array.Length) {
++		if (index < 0 || index >= array.Length)
++		{
+ 			return false;
+ 		}
++
+-		if (!_array[index].Id.IsActive) {
++		if (!array[index].Id.IsActive)
++		{
+ 			return false;
+ 		}
++
+ 		return true;
+ 	}
+ 
+ 	public ItemPair GetPair(int index)
+ 	{
+-		if (Has(index)) {
+-			return _array[index];
++		if (Has(index))
++		{
++			return array[index];
+ 		}
++
+-		return new ItemPair(default(T), SlotId.Invalid);
++		return new ItemPair(default, SlotId.INVALID);
+ 	}
+ 
+ 	IEnumerator IEnumerable.GetEnumerator()

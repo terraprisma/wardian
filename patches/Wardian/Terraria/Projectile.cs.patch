@@ -1,5 +1,37 @@
 --- decompiled/TerrariaUnified/Terraria/Projectile.cs
 +++ decompiled/Wardian/Terraria/Projectile.cs
+@@ -20937,11 +_,11 @@
+ 			if (activeSound != null) {
+ 				if (activeSound.Volume == 0f) {
+ 					activeSound.Stop();
+-					localAI[0] = SlotId.Invalid.ToFloat();
++					localAI[0] = SlotId.INVALID.ToFloat();
+ 				}
+ 				activeSound.Volume = Math.Max(0f, activeSound.Volume - 0.05f);
+ 			} else {
+-				localAI[0] = SlotId.Invalid.ToFloat();
++				localAI[0] = SlotId.INVALID.ToFloat();
+ 			}
+ 			if (this.ai[1] == 1f) {
+ 				friendly = false;
+@@ -26921,7 +_,7 @@
+ 		}
+ 		ActiveSound activeSound = SoundEngine.GetActiveSound(SlotId.FromFloat(localAI[1]));
+ 		if (activeSound == null) {
+-			localAI[1] = SlotId.Invalid.ToFloat();
++			localAI[1] = SlotId.INVALID.ToFloat();
+ 		} else {
+ 			activeSound.Position = base.Center;
+ 		}
+@@ -28999,7 +_,7 @@
+ 				activeSound.Position = base.Center;
+ 				activeSound.Volume = 1f - Math.Max(ai[1] - 555f, 0f) / 15f;
+ 			} else {
+-				localAI[1] = SlotId.Invalid.ToFloat();
++				localAI[1] = SlotId.INVALID.ToFloat();
+ 			}
+ 			ai[1] += 1f;
+ 			if (ai[1] > 560f) {
 @@ -29325,7 +_,7 @@
  				}
  			}
@@ -45,6 +77,33 @@
  			rotation = rotation.AngleLerp(idleRotation3, 0.45f);
  			if (Main.rand.Next(20) == 0) {
  				int num7 = AI_156_TryAttackingNPCs(blacklist);
+@@ -36007,7 +_,7 @@
+ 			if (activeSound != null) {
+ 				activeSound.Position = base.Center;
+ 			} else {
+-				localAI[0] = SlotId.Invalid.ToFloat();
++				localAI[0] = SlotId.INVALID.ToFloat();
+ 			}
+ 			if (alpha <= 0) {
+ 				for (int num123 = 0; num123 < 2; num123++) {
+@@ -45810,7 +_,7 @@
+ 		}
+ 		ActiveSound activeSound = SoundEngine.GetActiveSound(SlotId.FromFloat(localAI[1]));
+ 		if (activeSound == null) {
+-			localAI[1] = SlotId.Invalid.ToFloat();
++			localAI[1] = SlotId.INVALID.ToFloat();
+ 		} else {
+ 			activeSound.Position = base.Center;
+ 		}
+@@ -46034,7 +_,7 @@
+ 			activeSound.Position = base.Center;
+ 			activeSound.Volume = 1f - Math.Max(ai[0] - (num - 15f), 0f) / 15f;
+ 		} else {
+-			localAI[1] = SlotId.Invalid.ToFloat();
++			localAI[1] = SlotId.INVALID.ToFloat();
+ 		}
+ 		if (localAI[0] >= 16f && ai[0] < num - 15f) {
+ 			ai[0] = num - 15f;
 @@ -50916,7 +_,7 @@
  							for (int num831 = 0; num831 < 2; num831++) {
  								Vector2 value12 = vector69.RotatedBy(((num831 == 0) ? 1f : (-1f)) * ((float)Math.PI * 2f) / (num826 * 2f));

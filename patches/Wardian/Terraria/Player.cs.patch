@@ -1,5 +1,32 @@
 --- decompiled/TerrariaUnified/Terraria/Player.cs
 +++ decompiled/Wardian/Terraria/Player.cs
+@@ -569,9 +_,9 @@
+ 
+ 	private static float _blizzardSoundVolume;
+ 
+-	private static SlotId _strongBlizzardSound = SlotId.Invalid;
++	private static SlotId _strongBlizzardSound = SlotId.INVALID;
+ 
+-	private static SlotId _insideBlizzardSound = SlotId.Invalid;
++	private static SlotId _insideBlizzardSound = SlotId.INVALID;
+ 
+ 	public string name = "";
+ 
+@@ -13383,12 +_,12 @@
+ 					if (activeSound3 != null) {
+ 						activeSound3.Volume = 0f;
+ 					} else {
+-						_strongBlizzardSound = SlotId.Invalid;
++						_strongBlizzardSound = SlotId.INVALID;
+ 					}
+ 					if (activeSound4 != null) {
+ 						activeSound4.Volume = 0f;
+ 					} else {
+-						_insideBlizzardSound = SlotId.Invalid;
++						_insideBlizzardSound = SlotId.INVALID;
+ 					}
+ 				}
+ 			} catch {
 @@ -29526,7 +_,7 @@
  			int num5 = ((!Main.getGoodWorld) ? Projectile.NewProjectile(projectileSource_Misc, position.X + (float)(width / 2), position.Y + (float)(height / 2), (float)Main.rand.Next(10, 30) * 0.1f * (float)hitDirection + num, (float)Main.rand.Next(-40, -20) * 0.1f, num2, damage, num3, Main.myPlayer, num4) : Projectile.NewProjectile(projectileSource_Misc, position.X + (float)(width / 2), position.Y + (float)(height / 2), ((float)Main.rand.Next(10, 30) * 0.1f * (float)hitDirection + num) * 1.5f, (float)Main.rand.Next(-40, -20) * 0.1f * 1.5f, num2, damage, num3, Main.myPlayer, num4));
  			DateTime now = DateTime.Now;

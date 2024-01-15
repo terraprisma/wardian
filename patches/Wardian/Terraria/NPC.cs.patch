@@ -74,6 +74,61 @@
  								float num1570 = num1569;
  								if (num1570 > 0.5f) {
  									num1570 = 1f - num1570;
+@@ -29441,7 +_,7 @@
+ 			if (this.ai[1] == 0f) {
+ 				if (localAI[0] == 0f) {
+ 					SoundEngine.PlayTrackedSound(SoundID.DD2_EtherianPortalOpen, base.Center);
+-					localAI[3] = SlotId.Invalid.ToFloat();
++					localAI[3] = SlotId.INVALID.ToFloat();
+ 				}
+ 				if (localAI[0] > 150f) {
+ 					ActiveSound activeSound = SoundEngine.GetActiveSound(SlotId.FromFloat(localAI[3]));
+@@ -43370,7 +_,7 @@
+ 			rotation = rotation.AngleTowards(num46, num47);
+ 		}
+ 		if (SoundEngine.GetActiveSound(SlotId.FromFloat(localAI[2])) == null) {
+-			localAI[2] = SlotId.Invalid.ToFloat();
++			localAI[2] = SlotId.INVALID.ToFloat();
+ 		}
+ 	}
+ 
+@@ -44018,8 +_,8 @@
+ 			case 572:
+ 			case 573:
+ 				if (localAI[3] == 0f) {
+-					localAI[0] = SlotId.Invalid.ToFloat();
++					localAI[0] = SlotId.INVALID.ToFloat();
+-					localAI[1] = SlotId.Invalid.ToFloat();
++					localAI[1] = SlotId.INVALID.ToFloat();
+ 				}
+ 				flag21 = DD2Event.EnemiesShouldChasePlayers;
+ 				if (ai[1] == 2f) {
+@@ -44154,7 +_,7 @@
+ 					num24 = 0.01f + localAI[3] / 60f * 0.05f;
+ 				}
+ 				if (ai[0] == 0f) {
+-					localAI[1] = SlotId.Invalid.ToFloat();
++					localAI[1] = SlotId.INVALID.ToFloat();
+ 				}
+ 				if (ai[0] != 1f) {
+ 					break;
+@@ -46048,14 +_,14 @@
+ 		if (activeSound2 != null) {
+ 			activeSound2.Position = base.Center;
+ 		} else {
+-			localAI[1] = SlotId.Invalid.ToFloat();
++			localAI[1] = SlotId.INVALID.ToFloat();
+ 		}
+ 		if (type == 558 || type == 559 || type == 560) {
+ 			activeSound2 = SoundEngine.GetActiveSound(SlotId.FromFloat(localAI[2]));
+ 			if (activeSound2 != null) {
+ 				activeSound2.Position = base.Center;
+ 			} else {
+-				localAI[2] = SlotId.Invalid.ToFloat();
++				localAI[2] = SlotId.INVALID.ToFloat();
+ 			}
+ 		}
+ 		if (flag2 && ai[0] != 3f && Vector2.Distance(base.Center, targetData.Center) < 64f) {
 @@ -55808,7 +_,7 @@
  			return;
  		}

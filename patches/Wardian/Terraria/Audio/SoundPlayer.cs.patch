@@ -1,0 +1,37 @@
+--- decompiled/TerrariaUnified/Terraria/Audio/SoundPlayer.cs
++++ decompiled/Wardian/Terraria/Audio/SoundPlayer.cs
+@@ -11,10 +_,10 @@
+ 	public SlotId Play(SoundStyle style, Vector2 position)
+ 	{
+ 		if (Main.dedServ || style == null || !style.IsTrackable) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		if (Vector2.DistanceSquared(Main.screenPosition + new Vector2(Main.screenWidth / 2, Main.screenHeight / 2), position) > 100000000f) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		ActiveSound value = new ActiveSound(style, position);
+ 		return _trackedSounds.Add(value);
+@@ -23,10 +_,10 @@
+ 	public SlotId PlayLooped(SoundStyle style, Vector2 position, ActiveSound.LoopedPlayCondition loopingCondition)
+ 	{
+ 		if (Main.dedServ || style == null || !style.IsTrackable) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		if (Vector2.DistanceSquared(Main.screenPosition + new Vector2(Main.screenWidth / 2, Main.screenHeight / 2), position) > 100000000f) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		ActiveSound value = new ActiveSound(style, position, loopingCondition);
+ 		return _trackedSounds.Add(value);
+@@ -40,7 +_,7 @@
+ 	public SlotId Play(SoundStyle style)
+ 	{
+ 		if (Main.dedServ || style == null || !style.IsTrackable) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		ActiveSound value = new ActiveSound(style);
+ 		return _trackedSounds.Add(value);

@@ -1,0 +1,29 @@
+--- decompiled/TerrariaUnified/Terraria/Audio/SoundEngine.cs
++++ decompiled/Wardian/Terraria/Audio/SoundEngine.cs
+@@ -96,7 +_,7 @@
+ 	public static SlotId PlayTrackedSound(SoundStyle style, Vector2 position)
+ 	{
+ 		if (Main.dedServ || !IsAudioSupported) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		return SoundPlayer.Play(style, position);
+ 	}
+@@ -104,7 +_,7 @@
+ 	public static SlotId PlayTrackedLoopedSound(SoundStyle style, Vector2 position, ActiveSound.LoopedPlayCondition loopingCondition = null)
+ 	{
+ 		if (Main.dedServ || !IsAudioSupported) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		return SoundPlayer.PlayLooped(style, position, loopingCondition);
+ 	}
+@@ -112,7 +_,7 @@
+ 	public static SlotId PlayTrackedSound(SoundStyle style)
+ 	{
+ 		if (Main.dedServ || !IsAudioSupported) {
+-			return SlotId.Invalid;
++			return SlotId.INVALID;
+ 		}
+ 		return SoundPlayer.Play(style);
+ 	}

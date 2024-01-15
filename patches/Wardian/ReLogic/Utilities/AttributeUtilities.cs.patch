@@ -1,0 +1,53 @@
+--- decompiled/TerrariaUnified/ReLogic/Utilities/AttributeUtilities.cs
++++ decompiled/Wardian/ReLogic/Utilities/AttributeUtilities.cs
+@@ -1,36 +_,27 @@
+ using System;
+-using System.Linq;
+ using System.Reflection;
+ 
+ namespace ReLogic.Utilities;
+ 
++/// <summary>
++///		Utilities for interfacing and handling attributes.
++/// </summary>
+ public static class AttributeUtilities
+ {
+ 	private static class TypeAttributeCache<T, A> where A : Attribute
+ 	{
+-		public static readonly A Value = typeof(T).GetAttribute<A>();
+-	}
+-
+-	public static T GetAttribute<T>(this MethodBase method) where T : Attribute
+-	{
+-		return (T)method.GetCustomAttributes(typeof(T), inherit: false).SingleOrDefault();
+-	}
+-
+-	public static T GetAttribute<T>(this Enum value) where T : Attribute
+-	{
+-		Type type = value.GetType();
+-		string name = Enum.GetName(type, value);
+-		return type.GetField(name).GetCustomAttributes(inherit: false).OfType<T>()
+-			.SingleOrDefault();
+-	}
+-
++		public static readonly A VALUE = typeof(T).GetCustomAttribute<A>();
++	}
++
++	// TODO: Is maintenance here even worth it? It's hardly used, and I doubt it's a performance boost.
++	/// <summary>
++	///		Retrieves a cacheable attribute for a type.
++	/// </summary>
++	/// <typeparam name="T">The type.</typeparam>
++	/// <typeparam name="A">The attribute type.</typeparam>
++	/// <returns>The cached attribute instance.</returns>
+ 	public static A GetCacheableAttribute<T, A>() where A : Attribute
+ 	{
+-		return TypeAttributeCache<T, A>.Value;
++		return TypeAttributeCache<T, A>.VALUE;
+-	}
+-
+-	public static T GetAttribute<T>(this Type type) where T : Attribute
+-	{
+-		return type.GetCustomAttributes(inherit: false).OfType<T>().SingleOrDefault();
+ 	}
+ }
