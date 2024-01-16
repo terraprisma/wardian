@@ -1,6 +1,6 @@
 --- decompiled/TerrariaUnified/ReLogic/Utilities/Crc32.cs
 +++ decompiled/Wardian/ReLogic/Utilities/Crc32.cs
-@@ -1,50 +_,295 @@
+@@ -1,69 +_,286 @@
  namespace ReLogic.Utilities;
  
 +/// <summary>
@@ -306,46 +306,43 @@
  	public static int Calculate(string value)
  	{
 -		uint num = uint.MaxValue;
--		foreach (char c in value) {
--			num = Tabs[(num ^ c) & 0xFF] ^ (num >> 8);
 +		uint hash = uint.MaxValue;
 +
+-		foreach (char c in value) {
 +		foreach (char c in value)
 +		{
+-			num = Tabs[(num ^ c) & 0xFF] ^ (num >> 8);
 +			hash = tabs[(hash ^ c) & 0xFF] ^ (hash >> 8);
  		}
 +
 -		return (int)(~num);
 +		return (int)(~hash);
- 	}
- 
-+	/*
- 	public static int Calculate(string value, int baseHash)
- 	{
- 		uint num = (uint)(~baseHash);
- 		foreach (char c in value) {
+-	}
+-
+-	public static int Calculate(string value, int baseHash)
+-	{
+-		uint num = (uint)(~baseHash);
+-		foreach (char c in value) {
 -			num = Tabs[(num ^ c) & 0xFF] ^ (num >> 8);
-+			num = tabs[(num ^ c) & 0xFF] ^ (num >> 8);
- 		}
- 		return (int)(~num);
- 	}
-@@ -53,7 +_,7 @@
- 	{
- 		uint num = uint.MaxValue;
- 		foreach (byte b in value) {
+-		}
+-		return (int)(~num);
+-	}
+-
+-	public static int Calculate(byte[] value)
+-	{
+-		uint num = uint.MaxValue;
+-		foreach (byte b in value) {
 -			num = Tabs[(num ^ b) & 0xFF] ^ (num >> 8);
-+			num = tabs[(num ^ b) & 0xFF] ^ (num >> 8);
- 		}
- 		return (int)(~num);
- 	}
-@@ -62,8 +_,9 @@
- 	{
- 		uint num = (uint)(~baseHash);
- 		foreach (byte b in value) {
+-		}
+-		return (int)(~num);
+-	}
+-
+-	public static int Calculate(byte[] value, int baseHash)
+-	{
+-		uint num = (uint)(~baseHash);
+-		foreach (byte b in value) {
 -			num = Tabs[(num ^ b) & 0xFF] ^ (num >> 8);
-+			num = tabs[(num ^ b) & 0xFF] ^ (num >> 8);
- 		}
- 		return (int)(~num);
+-		}
+-		return (int)(~num);
  	}
-+	*/
  }

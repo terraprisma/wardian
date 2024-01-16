@@ -96,24 +96,42 @@
  						Microsoft.Xna.Framework.Rectangle rectangle8 = value40.Frame(1, 7, 0, (int)(num220 * 7f));
  						EntitySpriteDraw(value40, position7, rectangle8, transparent, proj.rotation + (float)Math.PI * 2f * (num220 + GlobalTimeWrappedHourly * 1.2f) * 0.2f + (float)num221 * ((float)Math.PI * 2f / 5f), rectangle8.Size() / 2f, num222, SpriteEffects.None);
  					}
-@@ -28779,7 +_,7 @@
+@@ -26663,8 +_,7 @@
+ 			if (proj.type == 434) {
+ 				Vector2 vector112 = new Vector2(proj.ai[0], proj.ai[1]);
+ 				Vector2 v = proj.position - vector112;
+-				float num420 = (float)Math.Sqrt(v.X * v.X + v.Y * v.Y);
+-				new Vector2(4f, num420);
++				float num420 = v.Length();
+ 				float rotation30 = v.ToRotation() + (float)Math.PI / 2f;
+ 				Vector2 vector113 = Vector2.Lerp(proj.position, vector112, 0.5f);
+ 				Microsoft.Xna.Framework.Color red = Microsoft.Xna.Framework.Color.Red;
+@@ -28779,10 +_,9 @@
  		if (!localPlayer.IsProjectileInteractibleAndInInteractionRange(proj, ref compareSpot)) {
  			return 0;
  		}
 -		Matrix matrix = Matrix.Invert(GameViewMatrix.ZoomMatrix);
-+		Matrix.Invert(GameViewMatrix.ZoomMatrix, out Matrix matrix);
  		Vector2 position = ReverseGravitySupport(MouseScreen);
- 		Vector2.Transform(screenPosition, matrix);
- 		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
-@@ -28844,7 +_,7 @@
+-		Vector2.Transform(screenPosition, matrix);
++		Vector2.Transform(screenPosition, GameViewMatrix.InverseZoomMatrix);
+-		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
++		Vector2 v = Vector2.Transform(position, GameViewMatrix.InverseZoomMatrix) + screenPosition;
+ 		bool flag2 = proj.Hitbox.Contains(v.ToPoint());
+ 		if (!((flag2 || SmartInteractProj == proj.whoAmI) & !localPlayer.lastMouseInterface)) {
+ 			if (!flag) {
+@@ -28844,10 +_,9 @@
  		if (!localPlayer.IsProjectileInteractibleAndInInteractionRange(proj, ref compareSpot)) {
  			return 0;
  		}
 -		Matrix matrix = Matrix.Invert(GameViewMatrix.ZoomMatrix);
-+		Matrix.Invert(GameViewMatrix.ZoomMatrix, out Matrix matrix);
  		Vector2 position = ReverseGravitySupport(MouseScreen);
- 		Vector2.Transform(screenPosition, matrix);
- 		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
+-		Vector2.Transform(screenPosition, matrix);
++		Vector2.Transform(screenPosition, GameViewMatrix.InverseZoomMatrix);
+-		Vector2 v = Vector2.Transform(position, matrix) + screenPosition;
++		Vector2 v = Vector2.Transform(position, GameViewMatrix.InverseZoomMatrix) + screenPosition;
+ 		bool flag2 = proj.Hitbox.Contains(v.ToPoint());
+ 		if (!((flag2 || SmartInteractProj == proj.whoAmI) & !localPlayer.lastMouseInterface)) {
+ 			if (!flag) {
 @@ -36380,7 +_,7 @@
  		string text = "";
  		float num4 = 215f;

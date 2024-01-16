@@ -1,11 +1,13 @@
 --- decompiled/TerrariaUnified/Terraria/GameContent/ObjectInteractions/AHoverInteractionChecker.cs
 +++ decompiled/Wardian/Terraria/GameContent/ObjectInteractions/AHoverInteractionChecker.cs
-@@ -19,7 +_,7 @@
+@@ -19,9 +_,8 @@
  		if (!player.IsInTileInteractionRange(point.X, point.Y, TileReachCheckSettings.Simple)) {
  			return HoverStatus.NotSelectable;
  		}
 -		Matrix matrix = Matrix.Invert(Main.GameViewMatrix.ZoomMatrix);
-+		Matrix.Invert(Main.GameViewMatrix.ZoomMatrix, out Matrix matrix);
  		Vector2 vector = Main.ReverseGravitySupport(Main.MouseScreen);
- 		Vector2.Transform(Main.screenPosition, matrix);
+-		Vector2.Transform(Main.screenPosition, matrix);
++		Vector2.Transform(Main.screenPosition, Main.GameViewMatrix.InverseZoomMatrix);
  		Vector2 v = vector + Main.screenPosition;
+ 		bool flag = Hitbox.Contains(v.ToPoint());
+ 		bool flag2 = flag;

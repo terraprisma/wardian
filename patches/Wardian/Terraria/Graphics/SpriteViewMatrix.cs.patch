@@ -1,7 +1,39 @@
 --- decompiled/TerrariaUnified/Terraria/Graphics/SpriteViewMatrix.cs
 +++ decompiled/Wardian/Terraria/Graphics/SpriteViewMatrix.cs
-@@ -121,7 +_,8 @@
+@@ -11,6 +_,8 @@
+ 
+ 	private Matrix _zoomMatrix = Matrix.Identity;
+ 
++	private Matrix _inverseZoomMatrix = Matrix.Identity;
++
+ 	private Matrix _transformationMatrix = Matrix.Identity;
+ 
+ 	private Matrix _normalizedTransformationMatrix = Matrix.Identity;
+@@ -57,6 +_,19 @@
+ 		}
+ 	}
+ 
++	public Matrix InverseZoomMatrix
++	{
++		get
++		{
++			if (ShouldRebuild())
++			{
++				Rebuild();
++			}
++
++			return _inverseZoomMatrix;
++		}
++	}
++
+ 	public Matrix TransformationMatrix {
+ 		get {
+ 			if (ShouldRebuild()) {
+@@ -119,9 +_,11 @@
+ 		Matrix matrix = Matrix.CreateOrthographicOffCenter(0f, vector.X, vector.Y, 0f, 0f, 1f);
+ 		_translation = translation;
  		_zoomMatrix = Matrix.CreateTranslation(0f - translation.X, 0f - translation.Y, 0f) * Matrix.CreateScale(_zoom.X, _zoom.Y, 1f);
++		Matrix.Invert(_zoomMatrix, out _inverseZoomMatrix);
  		_effectMatrix = identity;
  		_transformationMatrix = identity * _zoomMatrix;
 -		_normalizedTransformationMatrix = Matrix.Invert(identity) * _zoomMatrix * matrix;
