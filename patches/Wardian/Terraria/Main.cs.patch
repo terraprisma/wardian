@@ -1,5 +1,16 @@
 --- decompiled/TerrariaUnified/Terraria/Main.cs
 +++ decompiled/Wardian/Terraria/Main.cs
+@@ -1144,6 +_,10 @@
+ 
+ 	public static UIAchievementsMenu AchievementsMenu = new UIAchievementsMenu();
+ 
++	public static UILanguageSelectMenu LanguageSelectMenu_InitialialLanguageSelect = new(true);
++
++	public static UILanguageSelectMenu LanguageSelectMenu = new(false);
++
+ 	public static int maxRain = 750;
+ 
+ 	public static int slimeWarningTime;
 @@ -1875,9 +_,9 @@
  
  	public static bool Support4K = true;
@@ -12,6 +23,15 @@
  
  	private static int _renderTargetMaxSize = 2048;
  
+@@ -3653,7 +_,7 @@
+ 		configuration.Put("InvasionBarMode", invasionProgressMode);
+ 		configuration.Put("AutoSave", autoSave);
+ 		configuration.Put("AutoPause", autoPause);
+-		configuration.Put("Language", Language.ActiveCulture.Name);
++		configuration.Put("Language", Language.ActiveCulture.LanguageCode);
+ 		configuration.Put("PlacementPreview", placementPreview);
+ 		configuration.Put("GoreVisualsAllowed", ChildSafety.Disabled);
+ 		configuration.Put("WorldRollbacksToKeep", WorldRollingBackupsCountToKeep);
 @@ -3828,13 +_,18 @@
  		configuration.Get("AutoPause", ref autoPause);
  		_needsLanguageSelect = !configuration.Contains("Language");
@@ -27,7 +47,7 @@
 +			LanguageManager.INSTANCE.SetLanguage(text);
  			SetTitle();
 +		}*/
-+		_needsLanguageSelect = int.TryParse(text, out _);
++		_needsLanguageSelect = int.TryParse(text, out _) || !Languages.GameCultures.ContainsKey(text);
 +		if (!_needsLanguageSelect)
 +		{
 +			LanguageManager.INSTANCE.SetLanguage(Languages.GameCultures[text]);
@@ -50,7 +70,7 @@
  				if (num >= 46) {
  					mapEnabled = binaryReader.ReadBoolean();
  					cMapStyle = binaryReader.ReadString();
-@@ -4373,13 +_,14 @@
+@@ -4373,13 +_,13 @@
  				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "motd=") {
  					motd = text.Substring(5);
  				}
@@ -60,12 +80,13 @@
  					string value5 = text.Substring(5);
 -					LanguageManager.Instance.SetLanguage(Convert.ToInt32(value5));
 -				}
+-				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "language=") {
+-					string language = text.Substring(9);
+-					LanguageManager.Instance.SetLanguage(language);
 +					LanguageManager.INSTANCE.SetLanguage(Convert.ToInt32(value5));
 +				}*/
- 				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "language=") {
- 					string language = text.Substring(9);
--					LanguageManager.Instance.SetLanguage(language);
-+					LanguageManager.INSTANCE.SetLanguage(Languages.GameCultures[language]);
++				if (text.Length > 5 && text.Substring(0, 5).ToLower() == "language=" && Languages.GameCultures.TryGetValue(text.Substring(9), out GameCulture culture)) {
++					LanguageManager.INSTANCE.SetLanguage(culture);
  				}
  				if (text.Length >= 10 && text.Substring(0, 10).ToLower() == "worldpath=") {
  					string path2 = text.Substring(10);
@@ -78,6 +99,29 @@
  			ItemTooltip.InvalidateTooltips();
  		};
  		PlayerInput.OnBindingChange += ItemTooltip.InvalidateTooltips;
+@@ -9214,9 +_,6 @@
+ 		base.GraphicsDevice.DeviceLost += GraphicsDeviceLost;
+ 		base.GraphicsDevice.DeviceReset += GraphicsDeviceLost;
+ 		base.GraphicsDevice.DeviceResetting += GraphicsDeviceLost;
+-		if (_needsLanguageSelect) {
+-			menuMode = 1212;
+-		}
+ 		_achievements = new AchievementManager();
+ 		_achievementAdvisor = new AchievementAdvisor();
+ 		OpenRecent();
+@@ -9374,6 +_,12 @@
+ 		CacheSupportedDisplaySizes();
+ 		ContentSamples.RebuildItemCreativeSortingIDsAfterRecipesAreSetUp();
+ 		ContentSamples.CommonlyUsedContentSamples.PrepareAfterEverythingElseLoaded();
++
++		if (_needsLanguageSelect)
++		{
++			menuMode = 888;
++			MenuUI.SetState(LanguageSelectMenu_InitialialLanguageSelect);
++		}
+ 	}
+ 
+ 	private IEnumerator LoadMusic_InSteps()
 @@ -20828,7 +_,7 @@
  					float hue = ((float)i + 5f) / 10f;
  					float num10 = 200f;
@@ -150,31 +194,111 @@
  			Texture2D value2 = TextureAssets.ColorBar.Value;
  			_ = TextureAssets.ColorBlip.Value;
  			float num4 = MathHelper.Clamp((float)invasionProgress / (float)invasionProgressMax, 0f, 1f);
-@@ -37814,7 +_,7 @@
- 			array7[0] = 1f;
- 			if (selectedMenu >= 1) {
- 				changeTheTitle = true;
+@@ -37781,78 +_,7 @@
+ 		if (Program.LoadedEverything) {
+ 			GamepadMainMenuHandler.CanRun = true;
+ 		}
+-		if (menuMode == 1212) {
++		if (netMode == 2) {
+-			array9[0] = Lang.menu[102].Value;
+-			num4 = 50;
+-			num2 = 200;
+-			num4 = 33;
+-			num2 = 200;
+-			array4[0] = -20;
+-			array4[1] = 25;
+-			array4[2] = 25;
+-			array4[3] = 25;
+-			array4[4] = 25;
+-			array4[5] = 25;
+-			array4[6] = 25;
+-			array4[7] = 25;
+-			array4[8] = 25;
+-			array4[9] = 25;
+-			array[0] = true;
+-			array9[1] = Language.GetTextValue("Language.English");
+-			array9[2] = Language.GetTextValue("Language.German");
+-			array9[3] = Language.GetTextValue("Language.Italian");
+-			array9[4] = Language.GetTextValue("Language.French");
+-			array9[5] = Language.GetTextValue("Language.Spanish");
+-			array9[6] = Language.GetTextValue("Language.Russian");
+-			array9[7] = Language.GetTextValue("Language.Chinese");
+-			array9[8] = Language.GetTextValue("Language.Portuguese");
+-			array9[9] = Language.GetTextValue("Language.Polish");
+-			num5 = 10;
+-			for (int j = 0; j < num5; j++) {
+-				array7[j] = 0.75f;
+-			}
+-			array7[0] = 1f;
+-			if (selectedMenu >= 1) {
+-				changeTheTitle = true;
 -				LanguageManager.Instance.SetLanguage(selectedMenu);
-+				LanguageManager.INSTANCE.SetLanguage(Languages.DangerousGetCultureFromLegacyId(selectedMenu));
- 				menuMode = 0;
- 				SoundEngine.PlaySound(10);
- 				SaveSettings();
-@@ -37839,7 +_,7 @@
- 				SoundEngine.PlaySound(11);
- 			} else if (selectedMenu >= 1) {
- 				changeTheTitle = true;
+-				menuMode = 0;
+-				SoundEngine.PlaySound(10);
+-				SaveSettings();
+-			}
+-		} else if (menuMode == 1213) {
+-			array9[0] = Lang.menu[102].Value;
+-			array[0] = true;
+-			array9[1] = Language.GetTextValue("Language.English");
+-			array9[2] = Language.GetTextValue("Language.German");
+-			array9[3] = Language.GetTextValue("Language.Italian");
+-			array9[4] = Language.GetTextValue("Language.French");
+-			array9[5] = Language.GetTextValue("Language.Spanish");
+-			array9[6] = Language.GetTextValue("Language.Russian");
+-			array9[7] = Language.GetTextValue("Language.Chinese");
+-			array9[8] = Language.GetTextValue("Language.Portuguese");
+-			array9[9] = Language.GetTextValue("Language.Polish");
+-			array9[10] = Lang.menu[5].Value;
+-			num5 = 11;
+-			if (selectedMenu == 10 || flag5) {
+-				flag5 = false;
+-				menuMode = 11;
+-				SoundEngine.PlaySound(11);
+-			} else if (selectedMenu >= 1) {
+-				changeTheTitle = true;
 -				LanguageManager.Instance.SetLanguage(selectedMenu);
-+				LanguageManager.INSTANCE.SetLanguage(Languages.DangerousGetCultureFromLegacyId(selectedMenu));
- 				SoundEngine.PlaySound(12);
- 				SaveSettings();
+-				SoundEngine.PlaySound(12);
+-				SaveSettings();
+-			}
+-			num4 = 33;
+-			num2 = 200;
+-			array4[0] = -20;
+-			array4[10] = 10;
+-			for (int k = 0; k < num5; k++) {
+-				array7[k] = 0.75f;
+-			}
+-			array7[0] = 0.85f;
+-			array7[10] = 0.95f;
+-		} else if (netMode == 2) {
+ 			bool flag6 = true;
+ 			for (int l = 0; l < 8; l++) {
+ 				if (l >= 255) {
+@@ -38838,7 +_,8 @@
+ 				array9[num20] = Lang.menu[103].Value;
+ 				if (selectedMenu == num20) {
+ 					SoundEngine.PlaySound(10);
+-					menuMode = 1213;
++					menuMode = 888;
++					MenuUI.SetState(LanguageSelectMenu);
+ 				}
+ 				num20++;
+ 				array9[num20] = Lang.menu[5].Value;
+@@ -39811,7 +_,7 @@
  			}
-@@ -40550,7 +_,8 @@
+ 		}
+ 		if (menuMode == 888) {
+-			if (!_blockFancyUIWhileLoading) {
++			if (!_blockFancyUIWhileLoading && Assets != null) {
+ 				MenuUI.Draw(spriteBatch, gameTime);
+ 			}
+ 		} else {
+@@ -40550,7 +_,7 @@
  
  	private void OnSubmitServerPassword()
  	{
-+		// TODO: LegacyID no longer supported.
 -		string text = "-autoshutdown -password \"" + ConvertToSafeArgument(Netplay.ServerPassword) + "\" -lang " + Language.ActiveCulture.LegacyId;
-+		string text = "-autoshutdown -password \"" + ConvertToSafeArgument(Netplay.ServerPassword) /*+ "\" -lang " + Language.ActiveCulture.LegacyId*/;
++		string text = "-autoshutdown -password \"" + ConvertToSafeArgument(Netplay.ServerPassword) + "\" -language " + Language.ActiveCulture.LanguageCode;
  		if (Platform.IsLinux) {
  			text = ((IntPtr.Size != 8) ? (text + " -x86") : (text + " -x64"));
  		}

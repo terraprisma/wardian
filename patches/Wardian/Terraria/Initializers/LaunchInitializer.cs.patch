@@ -1,21 +1,22 @@
 --- decompiled/TerrariaUnified/Terraria/Initializers/LaunchInitializer.cs
 +++ decompiled/Wardian/Terraria/Initializers/LaunchInitializer.cs
-@@ -93,13 +_,14 @@
+@@ -93,13 +_,13 @@
  		if ((arg = TryParameter("-pass", "-password")) != null) {
  			Netplay.ServerPassword = Main.ConvertFromSafeArgument(arg);
  		}
--		string s2;
-+		// TODO: No longer support legacy language IDs. Should we bring this back?
-+		/*string s2;
- 		if ((s2 = TryParameter("-lang")) != null && int.TryParse(s2, out var result2)) {
++
+ 		string s2;
+-		if ((s2 = TryParameter("-lang")) != null && int.TryParse(s2, out var result2)) {
 -			LanguageManager.Instance.SetLanguage(result2);
-+			LanguageManager.INSTANCE.SetLanguage(result2);
- 		}
- 		if ((s2 = TryParameter("-language")) != null) {
+-		}
+-		if ((s2 = TryParameter("-language")) != null) {
 -			LanguageManager.Instance.SetLanguage(s2);
 -		}
-+			LanguageManager.INSTANCE.SetLanguage(s2);
-+		}*/
++		if ((s2 = TryParameter("-language")) != null && Languages.GameCultures.TryGetValue(s2, out GameCulture culture))
++		{
++			LanguageManager.INSTANCE.SetLanguage(culture);
++		}
++
  		string worldName;
  		if ((worldName = TryParameter("-worldname")) != null) {
  			game.SetWorldName(worldName);

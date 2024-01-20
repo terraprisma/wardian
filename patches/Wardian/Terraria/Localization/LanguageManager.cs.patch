@@ -246,7 +246,7 @@
  				break;
  			}
  		}
-@@ -146,15 +_,24 @@
+@@ -146,50 +_,76 @@
  
  	private void ProcessCopyCommandsInTexts()
  	{
@@ -278,8 +278,11 @@
  			}
  		}
  	}
-@@ -164,32 +_,49 @@
- 		string name = ActiveCulture.Name;
+ 
+ 	public void UseSources(List<IContentSource> sourcesFromLowestToHighest)
+ 	{
+-		string name = ActiveCulture.Name;
++		string name = ActiveCulture.LanguageCode;
  		string assetNameStart = ("Localization" + Path.DirectorySeparatorChar + name).ToLower();
  		LoadLanguage(ActiveCulture, processCopyCommands: false);
 +

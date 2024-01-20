@@ -77,69 +77,51 @@ public static class Languages
 	/// <param name="culture">The culture to register.</param>
 	public static void AddCulture(GameCulture culture)
 	{
-		GameCultures.Add(culture.Name, culture);
-	}
-
-	// UNSUPPORTED
-	internal static GameCulture DangerousGetCultureFromLegacyId(int id)
-	{
-		return id switch
-		{
-			1 => English,
-			2 => German,
-			3 => Italian,
-			4 => French,
-			5 => Spanish,
-			6 => Russian,
-			7 => SimplifiedChinese,
-			8 => BrazilianPortuguese,
-			9 => Polish,
-			_ => throw new IndexOutOfRangeException(nameof(id)),
-		};
+		GameCultures.Add(culture.LanguageCode, culture);
 	}
 
 	private sealed class EnglishGameCulture : GameCulture
 	{
-		public EnglishGameCulture() : base("en-US") { }
+		public EnglishGameCulture() : base("en-US", "English (United States)", "English (United States)") { }
 	}
 
 	private sealed class GermanGameCulture : GameCulture
 	{
-		public GermanGameCulture() : base("de-DE") { }
+		public GermanGameCulture() : base("de-DE", "German", "Deutsch") { }
 	}
 
 	private sealed class ItalianGameCulture : GameCulture
 	{
-		public ItalianGameCulture() : base("it-IT") { }
+		public ItalianGameCulture() : base("it-IT", "Italian", "Italiano") { }
 	}
 
 	private sealed class FrenchGameCulture : GameCulture
 	{
-		public FrenchGameCulture() : base("fr-FR") { }
+		public FrenchGameCulture() : base("fr-FR", "French", "Français") { }
 	}
 
 	private sealed class SpanishGameCulture : GameCulture
 	{
-		public SpanishGameCulture() : base("es-ES") { }
+		public SpanishGameCulture() : base("es-ES", "Spanish", "Español") { }
 	}
 
 	private sealed class RussianGameCulture : GameCulture
 	{
-		public RussianGameCulture() : base("ru-RU") { }
+		public RussianGameCulture() : base("ru-RU", "Russian", "Русский") { }
 	}
 
 	private sealed class SimplifiedChineseGameCulture : GameCulture
 	{
-		public SimplifiedChineseGameCulture() : base("zh-Hans") { }
+		public SimplifiedChineseGameCulture() : base("zh-Hans", "Chinese (Simplified)", "简体中文") { }
 	}
 
 	private sealed class BrazilianPortugueseGameCulture : GameCulture
 	{
-		public BrazilianPortugueseGameCulture() : base("pt-BR") { }
+		public BrazilianPortugueseGameCulture() : base("pt-BR", "Portuguese (Brazil)", "Português (Brasil)") { }
 	}
 
 	private sealed class PolishGameCulture : GameCulture
 	{
-		public PolishGameCulture() : base("pl-PL") { }
+		public PolishGameCulture() : base("pl-PL", "Polish", "Polski") { }
 	}
 }
